@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% set nav_map = {
+    'admin.dashboard': 'dashboard',
+    'admin.universities': 'universities',
+    'admin.university_add': 'universities',
+    'admin.university_edit': 'universities',
+    'admin.university_delete': 'universities',
+    'admin.university_toggle': 'universities',
+    'admin.university_logo_upload': 'universities',
+    'admin.programmes': 'programmes',
+    'admin.programme_add': 'programmes',
+    'admin.programme_edit': 'programmes',
+    'admin.programme_view': 'programmes',
+    'admin.programme_delete': 'programmes',
+    'admin.programme_toggle': 'programmes',
+    'admin.requirements': 'requirements',
+    'admin.careers': 'careers',
+    'admin.career_add': 'careers',
+    'admin.career_edit': 'careers',
+    'admin.career_delete': 'careers',
+    'admin.users': 'users',
+    'admin.user_edit': 'users',
+    'admin.user_delete': 'users',
+    'admin.user_toggle': 'users',
+    'admin.enquiries': 'enquiries',
+    'admin.import_data': 'import',
+    'admin.import_run': 'import',
+    'admin.data_overview': 'data',
+    'admin.data_run': 'data',
+    'admin.data_upload': 'data',
+    'admin.data_preview': 'data',
+    'admin.data_upload_delete': 'data',
+    'admin.data_run_delete': 'data',
+    'admin.data_download': 'data',
+    'admin.export_csv': 'data',
+    'admin.models_overview': 'models',
+    'admin.models_train': 'models',
+    'admin.model_approve': 'models',
+    'admin.predict': 'models',
+    'admin.activity_logs': 'logs',
+    'admin.settings': 'settings'
+} %}
+{% set active_nav = nav_map.get(request.endpoint, '') %}
+
+<div class="admin-shell{% if sidebar_compact %} admin-shell-compact{% endif %}">
+    <button class="btn btn-outline admin-toggle" type="button">☰ Menu</button>
+
+    <aside class="admin-sidebar" id="admin-sidebar">
+        <div class="side-group">Manage</div>
+        <a href="{{ url_for('admin.dashboard') }}" class="{{ 'active' if active_nav == 'dashboard' }}">
+            <span class="side-icon">▦</span><span>Dashboard</span>
+        </a>
+        <a href="{{ url_for('admin.universities') }}" class="{{ 'active' if active_nav == 'universities' }}">
+            <span class="side-icon">🏛</span><span>Universities</span>
+        </a>
+        <a href="{{ url_for('admin.programmes') }}" class="{{ 'active' if active_nav == 'programmes' }}">
+            <span class="side-icon">🎓</span><span>Programmes &amp; Courses</span>
+        </a>
+        <a href="{{ url_for('admin.requirements') }}" class="{{ 'active' if active_nav == 'requirements' }}">
+            <span class="side-icon">✔</span><span>Admission Requirements</span>
+        </a>
+        <a href="{{ url_for('admin.careers') }}" class="{{ 'active' if active_nav == 'careers' }}">
+            <span class="side-icon">🧭</span><span>Careers</span>
+        </a>
+        <a href="{{ url_for('admin.users') }}" class="{{ 'active' if active_nav == 'users' }}">
+            <span class="side-icon">👥</span><span>Users</span>
+        </a>
+        <a href="{{ url_for('admin.enquiries') }}" class="{{ 'active' if active_nav == 'enquiries' }}">
+            <span class="side-icon">✉</span><span>Enquiries</span>
+        </a>
+
+        <div class="side-group">Data</div>
+        <a href="{{ url_for('admin.import_data') }}" class="{{ 'active' if active_nav == 'import' }}">
+            <span class="side-icon">⇪</span><span>Import Dataset</span>
+        </a>
+        <a href="{{ url_for('admin.data_overview') }}" class="{{ 'active' if active_nav == 'data' }}">
+            <span class="side-icon">▤</span><span>Dataset Management</span>
+        </a>
+        <a href="{{ url_for('admin.export_csv', kind='programmes') }}">
+            <span class="side-icon">⤓</span><span>Export Data</span>
+        </a>
+        <a href="{{ url_for('admin.models_overview') }}" class="{{ 'active' if active_nav == 'models' }}">
+            <span class="side-icon">⚙</span><span>ML Models</span>
+        </a>
+
+        <div class="side-group">System</div>
+        <a href="{{ url_for('admin.activity_logs') }}" class="{{ 'active' if active_nav == 'logs' }}">
+            <span class="side-icon">🕘</span><span>Activity Logs</span>
+        </a>
+        <a href="{{ url_for('admin.settings') }}" class="{{ 'active' if active_nav == 'settings' }}">
+            <span class="side-icon">⚒</span><span>Settings</span>
+        </a>
+        <div class="side-divider"></div>
+        <a href="{{ url_for('main.index') }}"><span class="side-icon">🌐</span><span>View Website</span></a>
+        <a href="{{ url_for('auth.logout') }}"><span class="side-icon">⎋</span><span>Logout</span></a>
+    </aside>
+
+    <div class="admin-main">
+        {% block admin_content %}{% endblock %}
+    </div>
+</div>
+{% endblock %}

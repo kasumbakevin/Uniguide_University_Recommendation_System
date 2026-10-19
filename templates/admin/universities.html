@@ -1,0 +1,88 @@
+{% extends "admin/_layout.html" %}
+{% from "_macros.html" import university_logo with context %}
+{% from "admin/_bits.html" import pagination, delete_form, toggle_form with context %}
+{% block title %}Universities - Admin{% endblock %}
+{% block admin_content %}
+
+<div class="page-banner">
+    <div>
+        <h1>Manage Universities</h1>
+        <p>Add, edit, activate or remove universities and their contact details.</p>
+    </div>
+    <div class="banner-actions">
+        <a class="btn btn-outline" href="{{ url_for('admin.export_csv', kind='universities') }}">Export CSV</a>
+        <a class="btn btn-primary" href="{{ url_for('admin.university_add') }}">+ Add New</a>
+    </div>
+</div>
+
+<form class="table-controls" method="get" action="{{ url_for('admin.universities') }}">
+    <input type="search" name="q" value="{{ q }}" placeholder="Search name, region or district…">
+    <select name="status">
+        <option value="">All statuses</option>
+        <option value="active" {{ 'selected' if status == 'active' }}>Active only</option>
+        <option value="inactive" {{ 'selected' if status == 'inactive' }}>Inactive only</option>
+    </select>
+    <select name="sort">
+        <option value="name" {{ 'selected' if sort == 'name' }}>Sort by name</option>
+        <option value="region" {{ 'selected' if sort == 'region' }}>Sort by region</option>
+        <option value="district" {{ 'selected' if sort == 'district' }}>Sort by district</option>
+        <option value="type" {{ 'selected' if sort == 'type' }}>Sort by type</option>
+    </select>
+    <select name="dir">
+        <option value="asc" {{ 'selected' if direction == 'asc' }}>Ascending</option>
+        <option value="desc" {{ 'selected' if direction == 'desc' }}>Descending</option>
+    </select>
+    <button class="btn btn-sm btn-outline" type="submit">Apply</button>
+    <a class="btn btn-sm btn-ghost" href="{{ url_for('admin.universities') }}">Reset</a>
+    <span class="result-count">{{ page_obj.total if page_obj else universities|length }} result(s)</span>
+</form>
+
+{% if not universities %}
+    <div class="empty-state">
+        <strong>No universities match your search</strong>
+        Clear the filters or add a new university.
+    </div>
+{% else %}
+<div class="table-wrap">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Region</th>
+                <th>District</th>
+                <th>Website</th>
+                <th>Programmes</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for university in universities %}
+                <tr>
+                    <td>
+                        <div class="table-entity">
+                            {{ university_logo(university, 'tiny') }}
+                            <span>{{ university.name }}</span>
+                        </div>
+                    </td>
+                    <td>{{ university.institution_type.title() }}</td>
+                    <td>{{ university.region or '—' }}</td>
+                    <td>{{ university.district or '—' }}</td>
+                    <td>{% if university.website %}<a href="{{ university.website }}" target="_blank" rel="noopener">Visit</a>{% else %}—{% endif %}</td>
+                    <td>{{ university.programmes.filter_by(active=True).count() }}</td>
+                    <td><span class="badge {{ 'badge-on' if university.active else 'badge-off' }}">{{ 'Active' if university.active else 'Inactive' }}</span></td>
+                    <td class="row-actions">
+                        <a class="text-link" href="{{ url_for('admin.university_edit', university_id=university.id) }}">Edit</a>
+                        {{ toggle_form(url_for('admin.university_toggle', university_id=university.id), university.active) }}
+                        {{ delete_form(url_for('admin.university_delete', university_id=university.id), university.name, require_typing=true) }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{{ pagination(page_obj) }}
+{% endif %}
+
+{% endblock %}

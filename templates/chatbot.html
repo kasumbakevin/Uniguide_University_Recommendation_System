@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}AI Career Guidance - UniGuide Uganda{% endblock %}
+{% block content %}
+
+<div class="page-banner">
+    <div>
+        <h1>AI Career Guidance</h1>
+        <p>Ask about courses, cut-off points, fees or careers. Guidance is grounded in the verified UniGuide dataset.</p>
+    </div>
+</div>
+
+<div class="chat-wrap">
+    <div class="chat-messages" id="chat-messages" role="log" aria-live="polite">
+        <div class="chat-bubble bot">
+            <div class="chat-avatar">Uni</div>
+            <p>Hello! I am the UniGuide assistant for students in Uganda. Ask me questions like:<br>
+            • Which course suits a career in software development?<br>
+            • Which university can I join with my grades?<br>
+            • What cut-off does Medicine need?<br>
+            • Which programmes are cheapest?</p>
+        </div>
+    </div>
+    <form class="chat-input" id="chat-form">
+        <input type="text" id="chat-question" placeholder="Type your question..." autocomplete="off" aria-label="Your question">
+        <button class="btn btn-primary" type="submit">Send</button>
+    </form>
+    <p class="chat-note">Uni uses verified admission information, but cut-off points and fees change each year.
+        Always confirm your eligibility with the university admissions office.</p>
+</div>
+
+{% endblock %}

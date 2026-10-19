@@ -1,0 +1,71 @@
+{% extends "admin/_layout.html" %}
+{% from "admin/_bits.html" import delete_form, toggle_form with context %}
+{% block title %}{{ programme.name }} - Admin{% endblock %}
+{% block admin_content %}
+
+<div class="page-banner">
+    <div>
+        <h1>{{ programme.name }}</h1>
+        <p>{{ programme.university.name if programme.university else 'Unassigned university' }}
+           · {{ programme.level }} · {{ programme.admission_year or 'year not set' }}</p>
+    </div>
+    <div class="banner-actions">
+        <a class="btn btn-outline" href="{{ url_for('admin.programmes') }}">Back to list</a>
+        <a class="btn btn-primary" href="{{ url_for('admin.programme_edit', programme_id=programme.id) }}">Edit</a>
+        {{ toggle_form(url_for('admin.programme_toggle', programme_id=programme.id), programme.active) }}
+        {{ delete_form(url_for('admin.programme_delete', programme_id=programme.id), programme.name, label='Delete', button_class='btn btn-sm btn-ghost', require_typing=true) }}
+    </div>
+</div>
+
+<div class="settings-grid">
+    <div class="card">
+        <h2>Admission requirements</h2>
+        <ul class="check-list">
+            <li><strong>Qualification level:</strong> {{ programme.qualification_level or '—' }}</li>
+            <li><strong>Principal passes required:</strong> {{ programme.principal_passes if programme.principal_passes is not none else '—' }}</li>
+            <li><strong>Essential subjects:</strong> {{ programme.essential_subjects or 'not specified' }}</li>
+            <li><strong>Relevant subjects:</strong> {{ programme.relevant_subjects or 'not specified' }}</li>
+            <li><strong>Minimum grades:</strong> {{ programme.minimum_grades or 'not specified' }}</li>
+            <li><strong>UCE requirement:</strong> {{ programme.uce_requirement or 'not specified' }}</li>
+            <li><strong>Foreign minimum total:</strong> {{ programme.foreign_min_total if programme.foreign_min_total is not none else '—' }}</li>
+            <li><strong>International applicants:</strong> {{ 'Accepted' if programme.international_eligible else 'Not accepted' }}</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>Cut-off points &amp; fees</h2>
+        <ul class="check-list">
+            <li><strong>Academic year:</strong> {{ programme.admission_year or '—' }}</li>
+            <li><strong>Government cut-off:</strong> {{ programme.cutoff_government if programme.cutoff_government is not none else 'not published' }}</li>
+            <li><strong>Private cut-off:</strong> {{ programme.cutoff_private if programme.cutoff_private is not none else 'not published' }}</li>
+            <li><strong>Tuition (government):</strong> {{ programme.tuition_government|money if programme.tuition_government else 'not published' }}</li>
+            <li><strong>Tuition (private):</strong> {{ programme.tuition_private|money if programme.tuition_private else 'not published' }}</li>
+            <li><strong>Fees verified:</strong> {{ 'Yes' if programme.fees_verified else 'No' }}</li>
+            <li><strong>Duration:</strong> {{ programme.duration_years }} year(s)</li>
+            <li><strong>Status:</strong>
+                <span class="badge {{ 'badge-on' if programme.active else 'badge-off' }}">{{ 'Active' if programme.active else 'Inactive' }}</span>
+            </li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>Source &amp; links</h2>
+        <ul class="check-list">
+            <li><strong>Official source:</strong>
+                {% if programme.official_source %}
+                    <a href="{{ programme.official_source }}" target="_blank" rel="noopener">Open official document</a>
+                {% else %}not recorded{% endif %}
+            </li>
+            <li><strong>Created:</strong> {{ programme.created_at.strftime('%d %b %Y') if programme.created_at else '—' }}</li>
+            <li><strong>Last updated:</strong> {{ programme.updated_at.strftime('%d %b %Y %H:%M') if programme.updated_at else '—' }}</li>
+            <li><strong>Saved recommendations:</strong> {{ saved_count }}</li>
+            <li><strong>Career links:</strong>
+                {% if programme.careers %}
+                    {% for career in programme.careers %}{{ career.name }}{{ ', ' if not loop.last }}{% endfor %}
+                {% else %}none{% endif %}
+            </li>
+        </ul>
+    </div>
+</div>
+
+{% endblock %}

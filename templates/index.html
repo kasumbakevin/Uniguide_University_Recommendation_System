@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% from "_macros.html" import university_logo with context %}
+{% block title %}UniGuide Uganda - Find the right course for your future{% endblock %}
+{% block content %}
+
+<section class="hero">
+    <div class="hero-copy">
+        <span class="hero-eyebrow">UniGuide Uganda</span>
+        <h1>Find the right course for your future</h1>
+        <p>Enter your grades and preferences to discover universities and courses in Uganda that match your
+            academic results, budget and career goals.</p>
+        <div class="hero-actions">
+            {% if current_user.is_authenticated and not current_user.is_admin() %}
+                <a class="btn btn-primary btn-lg" href="{{ url_for('student.profile') }}">Find My University</a>
+                <a class="btn btn-ghost" href="{{ url_for('student.recommendations') }}">View my matches</a>
+            {% else %}
+                <a class="btn btn-primary btn-lg" href="{{ url_for('auth.register') }}">Find My University</a>
+                <a class="btn btn-ghost" href="{{ url_for('auth.login') }}">I already have an account</a>
+            {% endif %}
+        </div>
+
+        <div class="hero-stats">
+            <div class="stat"><strong>{{ "{:,}".format(programme_count) }}</strong><span>Courses</span></div>
+            <div class="stat"><strong>{{ universities|length }}</strong><span>Universities</span></div>
+            <div class="stat"><strong>{{ career_count }}</strong><span>Career paths</span></div>
+        </div>
+    </div>
+
+    <div class="hero-image">
+        <div class="hero-photo">
+            <img src="{{ url_for('static', filename='images/campus-hero.jfif') }}" alt="African students on campus">
+            <span class="hero-image-caption">University campus life in Uganda</span>
+        </div>
+    </div>
+</section>
+
+<section class="section section-light how-it-works">
+    <div class="section-head">
+        <h2>How UniGuide works</h2>
+        <p>Three simple steps from your grades to your best university matches.</p>
+    </div>
+    <div class="card-grid">
+        <div class="card step-card">
+            <div class="step-number">1</div>
+            <h3>Create your profile</h3>
+            <p>Register and enter your UCE / UACE results, budget, preferred region and career interests.
+                Ugandan or international — we adapt to your qualification system.</p>
+        </div>
+        <div class="card step-card">
+            <div class="step-number">2</div>
+            <h3>Check your matches</h3>
+            <p>Our engine checks minimum requirements, compares essential subjects, fees and location,
+                then ranks eligible universities and courses with clear reasons.</p>
+        </div>
+        <div class="card step-card">
+            <div class="step-number">3</div>
+            <h3>Choose with confidence</h3>
+            <p>Save recommendations, compare universities, get career guidance and export a PDF report —
+                then apply through official application links.</p>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-head">
+        <h2>Explore universities</h2>
+        <p>Public and private universities across all regions of Uganda.</p>
+    </div>
+    <div class="card-grid">
+        {% for university in universities[:9] %}
+            <a class="card university-card" href="{{ url_for('main.university_detail', university_id=university.id) }}">
+                {{ university_logo(university) }}
+                <h3>{{ university.name }}</h3>
+                <p class="muted">{{ university.location or university.district or university.region }}
+                    {% if university.institution_type %} · {{ university.institution_type.title() }}{% endif %}</p>
+                <span class="text-link">View programmes →</span>
+            </a>
+        {% endfor %}
+    </div>
+    <div class="section-center">
+        <a class="btn btn-outline" href="{{ url_for('main.universities') }}">See all universities</a>
+    </div>
+</section>
+
+<section class="section section-light career-section">
+    <div class="career-copy">
+        <h2>Career guidance that follows you</h2>
+        <p>Not sure what to study? Tell us what you love and we recommend A-Level subject combinations,
+            courses and career paths grounded in verified admission information.</p>
+        <ul class="check-list">
+            <li>Recommended A-Level subject combinations</li>
+            <li>Courses matched to careers</li>
+            <li>Programme entry requirements and cut-off points</li>
+            <li>Clear reasons for every recommendation</li>
+        </ul>
+        <div class="hero-actions">
+            {% if current_user.is_authenticated and not current_user.is_admin() %}
+                <a class="btn btn-primary" href="{{ url_for('student.chatbot') }}">Ask the AI Guide</a>
+            {% else %}
+                <a class="btn btn-primary" href="{{ url_for('auth.register') }}">Get started free</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="hero-image">
+        <div class="hero-image">
+            <div class="hero-photo">
+                <img src="{{ url_for('static', filename='images/carrier.jpg') }}" alt="Graduation and career guidance">
+                <span class="hero-image-caption">Graduation and career guidance</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

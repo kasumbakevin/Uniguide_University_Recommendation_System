@@ -1,0 +1,79 @@
+{
+  "run_id": "20261017-083414",
+  "started": "2026-10-17T08:34:14",
+  "data_dir": "data",
+  "universities": {
+    "rows_in": 11,
+    "rows_out": 11
+  },
+  "programmes": {
+    "rows_in": 75,
+    "rows_out": 75,
+    "duplicates": 0
+  },
+  "catalogues": {
+    "rows_in": 376,
+    "rows_out": 376,
+    "duplicates": 21
+  },
+  "careers": {
+    "rows_in": 21,
+    "rows_out": 21
+  },
+  "nche_register": {
+    "rows_in": 3753,
+    "rows_out": 3622
+  },
+  "nche_institutions": {
+    "rows_in": 178,
+    "rows_out": 153
+  },
+  "pdf_extraction": {
+    "cutoff_rows": 1519,
+    "fee_rows": 3,
+    "documents": 19,
+    "needs_review": 3
+  },
+  "merged": {
+    "rows_out": 75,
+    "stages": [
+      {
+        "stage": "start",
+        "rows": 75
+      },
+      {
+        "stage": "attach_nche_accreditation",
+        "rows": 75
+      },
+      {
+        "stage": "attach_pdf_cutoffs",
+        "rows": 75
+      }
+    ]
+  },
+  "training": {
+    "rows_out": 3622,
+    "label": "discipline",
+    "classes": 12
+  },
+  "quality": {
+    "programmes": {
+      "rows": 75,
+      "readiness": "ready_with_warnings"
+    },
+    "catalogues": {
+      "rows": 376,
+      "readiness": "ready"
+    },
+    "nche_register": {
+      "rows": 3622,
+      "readiness": "ready"
+    },
+    "training": {
+      "rows": 3622,
+      "readiness": "ready"
+    }
+  },
+  "finished": "2026-10-17T08:34:43",
+  "output_dir": "data\\processed\\20261017-083414"
+}

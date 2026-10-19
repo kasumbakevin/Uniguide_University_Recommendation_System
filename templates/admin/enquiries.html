@@ -1,0 +1,46 @@
+{% extends "admin/_layout.html" %}
+{% from "admin/_bits.html" import delete_form with context %}
+{% block title %}Enquiries - Admin{% endblock %}
+{% block admin_content %}
+
+<div class="page-banner">
+    <div>
+        <h1>Enquiries</h1>
+        <p>Messages sent from the public contact form.
+           {% if unread %}<span class="badge badge-off">{{ unread }} unread</span>{% endif %}</p>
+    </div>
+</div>
+
+{% if not enquiries %}
+    <div class="empty-state">
+        <strong>No enquiries yet</strong>
+        Messages submitted on the contact page will appear here.
+    </div>
+{% else %}
+    <div class="enquiry-list">
+        {% for enquiry in enquiries %}
+            <div class="enquiry-card">
+                <div class="enquiry-head">
+                    <strong>{{ enquiry.name }}</strong>
+                    <span class="enquiry-category">{{ enquiry.category }}</span>
+                    <span class="badge {{ 'badge-on' if enquiry.read else 'badge-off' }}">{{ 'Read' if enquiry.read else 'Unread' }}</span>
+                    <span class="summary-year">{{ enquiry.created_at.strftime('%d %b %Y %H:%M') if enquiry.created_at else '' }}</span>
+                </div>
+                {% if enquiry.subject %}<h3>{{ enquiry.subject }}</h3>{% endif %}
+                <p class="muted"><a href="mailto:{{ enquiry.email }}">{{ enquiry.email }}</a></p>
+                <p>{{ enquiry.message }}</p>
+                <div class="row-actions">
+                    <form method="post" action="{{ url_for('admin.enquiry_toggle', enquiry_id=enquiry.id) }}" class="inline-form">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button class="btn btn-sm btn-ghost" type="submit">{{ 'Mark as read' if not enquiry.read else 'Mark as unread' }}</button>
+                    </form>
+                    <a class="btn btn-sm btn-ghost" href="mailto:{{ enquiry.email }}?subject=Re: {{ enquiry.subject or 'Your enquiry' }}">Reply by email</a>
+                    {{ delete_form(url_for('admin.enquiry_delete', enquiry_id=enquiry.id),
+                                   enquiry.subject or enquiry.name) }}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% endblock %}

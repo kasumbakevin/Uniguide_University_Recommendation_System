@@ -1,0 +1,61 @@
+{% extends "admin/_layout.html" %}
+{% set fd = form_data if form_data else {} %}
+{% block title %}Edit User - Admin{% endblock %}
+{% block admin_content %}
+
+<div class="page-banner">
+    <div>
+        <h1>Edit User</h1>
+        <p>Change account details and role. Passwords are managed from Settings → Admin Account
+           by the account owner.</p>
+    </div>
+    <a class="btn btn-ghost" href="{{ url_for('admin.users') }}">Back to users</a>
+</div>
+
+<form method="post" class="profile-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <section class="form-section">
+        <div class="field-row">
+            <div class="field">
+                <label>Full name</label>
+                <input type="text" name="name" required maxlength="120"
+                       value="{{ fd.get('name', user.name if user else '') }}">
+            </div>
+            <div class="field">
+                <label>Username</label>
+                <input type="text" name="username" maxlength="80"
+                       value="{{ fd.get('username', user.username if user and user.username else '') }}"
+                       placeholder="optional">
+            </div>
+        </div>
+        <div class="field-row">
+            <div class="field">
+                <label>Email</label>
+                <input type="email" name="email" required maxlength="120"
+                       value="{{ fd.get('email', user.email if user else '') }}">
+                <p class="field-hint">Shown in the admin table; used to sign in.</p>
+            </div>
+            <div class="field">
+                <label>Role</label>
+                <select name="role">
+                    {% set selected_role = fd.get('role', user.role if user else 'student') %}
+                    <option value="student" {{ 'selected' if selected_role == 'student' }}>Student</option>
+                    <option value="admin" {{ 'selected' if selected_role == 'admin' }}>Administrator</option>
+                </select>
+                <p class="field-hint">Only administrators can open /admin pages.</p>
+            </div>
+        </div>
+        <div class="field">
+            <label class="check-item">
+                <input type="checkbox" name="active" {{ 'checked' if user and user.active is not false }}>
+                Account active (deactivated accounts cannot sign in)
+            </label>
+        </div>
+    </section>
+    <div class="form-actions">
+        <button class="btn btn-primary" type="submit">Save Changes</button>
+        <a class="btn btn-ghost" href="{{ url_for('admin.users') }}">Cancel</a>
+    </div>
+</form>
+
+{% endblock %}

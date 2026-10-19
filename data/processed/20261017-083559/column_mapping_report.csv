@@ -1,0 +1,91 @@
+original,standardised,action,source
+name,university,renamed,universities.csv
+institution_type,institution_type,kept,universities.csv
+region,region,kept,universities.csv
+district,district,kept,universities.csv
+location,location,kept,universities.csv
+established,established,kept,universities.csv
+website,website,kept,universities.csv
+application_link,application_link,kept,universities.csv
+image,image,kept,universities.csv
+active,active,kept,universities.csv
+University,university,renamed,programmes.csv
+Course,programme,renamed,programmes.csv
+Qualification Level,qualification_level,renamed,programmes.csv
+Essential Subjects,essential_subjects,renamed,programmes.csv
+Minimum Grades,minimum_grades,renamed,programmes.csv
+Principal Passes,principal_passes,renamed,programmes.csv
+Cut-off Points,cutoff_pairs,renamed,programmes.csv
+Tuition Fees,tuition_pairs,renamed,programmes.csv
+Academic Year,academic_year,renamed,programmes.csv
+Official Source,official_source,renamed,programmes.csv
+Sponsorship,sponsorship,renamed,programmes.csv
+Citizenship Applicability,citizenship_applicability,renamed,programmes.csv
+Required UCE,uce_requirement,renamed,programmes.csv
+Subject Weights,subject_weights,renamed,programmes.csv
+Duration,duration_years,renamed,programmes.csv
+District/Region,district_region,renamed,programmes.csv
+Application Link,application_link,renamed,programmes.csv
+Data-Year,data_year,renamed,programmes.csv
+University,university,renamed,programmes_mru.csv
+Course,programme,renamed,programmes_mru.csv
+Qualification Level,qualification_level,renamed,programmes_mru.csv
+Essential Subjects,essential_subjects,renamed,programmes_mru.csv
+Minimum Grades,minimum_grades,renamed,programmes_mru.csv
+Principal Passes,principal_passes,renamed,programmes_mru.csv
+Cut-off Points,cutoff_pairs,renamed,programmes_mru.csv
+Tuition Fees,tuition_pairs,renamed,programmes_mru.csv
+Academic Year,academic_year,renamed,programmes_mru.csv
+Official Source,official_source,renamed,programmes_mru.csv
+Sponsorship,sponsorship,renamed,programmes_mru.csv
+Citizenship Applicability,citizenship_applicability,renamed,programmes_mru.csv
+Required UCE,uce_requirement,renamed,programmes_mru.csv
+Subject Weights,subject_weights,renamed,programmes_mru.csv
+Duration,duration_years,renamed,programmes_mru.csv
+District/Region,district_region,renamed,programmes_mru.csv
+Application Link,application_link,renamed,programmes_mru.csv
+Data-Year,data_year,renamed,programmes_mru.csv
+list_page,list_page,kept,busitema_undergraduate_programmes.csv
+programme_name,programme,renamed,busitema_undergraduate_programmes.csv
+programme_code,programme_code,renamed,busitema_undergraduate_programmes.csv
+overview_url,url,renamed,busitema_undergraduate_programmes.csv
+description_excerpt,description,renamed,busitema_undergraduate_programmes.csv
+Page,Page,kept,gulu_university_undergraduate_programmes.csv
+Programme,programme,renamed,gulu_university_undergraduate_programmes.csv
+Code,programme_code,renamed,gulu_university_undergraduate_programmes.csv
+Duration,duration_years,renamed,gulu_university_undergraduate_programmes.csv
+Study time,study_time,renamed,gulu_university_undergraduate_programmes.csv
+Intake,Intake,kept,gulu_university_undergraduate_programmes.csv
+URL,url,renamed,gulu_university_undergraduate_programmes.csv
+S/N,S/N,kept,kyambogo_undergraduate_programmes.csv
+Programme,programme,renamed,kyambogo_undergraduate_programmes.csv
+Prog Code (Day),programme_code,renamed,kyambogo_undergraduate_programmes.csv
+Prog Code (Evening),Prog Code (Evening),kept,kyambogo_undergraduate_programmes.csv
+Minimum Admission Requirements,admission_requirements,renamed,kyambogo_undergraduate_programmes.csv
+Duration,duration_years,renamed,kyambogo_undergraduate_programmes.csv
+School/Faculty,faculty,renamed,kyambogo_undergraduate_programmes.csv
+No,No,kept,must_undergraduate_programmes.csv
+Programme Name,programme,renamed,must_undergraduate_programmes.csv
+Code,programme_code,renamed,must_undergraduate_programmes.csv
+Duration,duration_years,renamed,must_undergraduate_programmes.csv
+Study Time,study_time,renamed,must_undergraduate_programmes.csv
+Level,level,renamed,must_undergraduate_programmes.csv
+Level,level,renamed,nkumba_university_programs.csv
+Program,programme,renamed,nkumba_university_programs.csv
+Duration,duration_years,renamed,nkumba_university_programs.csv
+URL,url,renamed,nkumba_university_programs.csv
+School/Faculty,faculty,renamed,ucu_undergraduate_programs_tuition.csv
+Program,programme,renamed,ucu_undergraduate_programs_tuition.csv
+Level,level,renamed,ucu_undergraduate_programs_tuition.csv
+Duration (years),duration_years,renamed,ucu_undergraduate_programs_tuition.csv
+Tuition 2025 nationals (UGX) as listed,tuition_national_ugx,renamed,ucu_undergraduate_programs_tuition.csv
+Note,notes,renamed,ucu_undergraduate_programs_tuition.csv
+Course,programme,renamed,umu_bachelors_programmes.csv
+Duration,duration_years,renamed,umu_bachelors_programmes.csv
+Fee Structure Source,url,renamed,umu_bachelors_programmes.csv
+name,career,renamed,careers.csv
+description,description,kept,careers.csv
+required_subjects,required_subjects,kept,careers.csv
+skills,skills,kept,careers.csv
+pathways,pathways,kept,careers.csv
+programmes,programmes,kept,careers.csv

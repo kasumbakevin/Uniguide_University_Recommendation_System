@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="{{ site_theme }}" style="--green: {{ accent_color }};">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{% block title %}{{ site_name }}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+</head>
+<body>
+<header class="navbar">
+    <div class="container navbar-inner">
+        <a class="brand" href="{{ url_for('main.index') }}">
+            <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M22 10 12 5 2 10l10 5 10-5z"></path>
+                <path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"></path>
+                <path d="M22 10v6"></path>
+            </svg>
+            <span class="brand-name">UniGuide Uganda</span>
+        </a>
+
+        <nav class="nav-links" aria-label="Main navigation">
+            <a href="{{ url_for('main.index') }}">Home</a>
+            <a href="{{ url_for('main.universities') }}">Universities</a>
+            <a href="{{ url_for('main.contact') }}">Contact</a>
+            {% if current_user.is_authenticated %}
+                {% if current_user.is_admin() %}
+                    <a href="{{ url_for('admin.dashboard') }}">Admin</a>
+                    <a href="{{ url_for('admin.settings') }}">Settings</a>
+                    <a href="{{ url_for('student.dashboard') }}">Dashboard</a>
+                {% else %}
+                    <a href="{{ url_for('student.recommendations') }}">Recommendations</a>
+                    <a href="{{ url_for('student.compare') }}">Compare</a>
+                    <a href="{{ url_for('student.chatbot') }}">AI Guide</a>
+                    <a href="{{ url_for('student.dashboard') }}">Dashboard</a>
+                {% endif %}
+                <a class="nav-logout" href="{{ url_for('auth.logout') }}">Logout</a>
+            {% else %}
+                <a class="nav-login" href="{{ url_for('auth.login') }}">Login</a>
+                <a class="nav-register" href="{{ url_for('auth.register') }}">Register</a>
+            {% endif %}
+        </nav>
+
+        <button class="nav-toggle" aria-label="Toggle menu">☰</button>
+    </div>
+</header>
+
+<main class="container main-content">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-area">
+                {% for category, message in messages %}
+                    <div class="flash flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="footer">
+    <div class="container footer-inner">
+        <div>
+            <div class="brand footer-brand">
+                <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M22 10 12 5 2 10l10 5 10-5z"></path>
+                    <path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"></path>
+                </svg>
+                <span class="brand-name">UniGuide Uganda</span>
+            </div>
+            <p class="footer-tag">Find the right course for your future.</p>
+        </div>
+        <div class="footer-links">
+            <a href="{{ url_for('main.index') }}">Home</a>
+            <a href="{{ url_for('main.universities') }}">Universities</a>
+            <a href="{{ url_for('main.contact') }}">Contact</a>
+            <a href="{{ url_for('auth.register') }}">Create Account</a>
+            <a href="{{ url_for('auth.login') }}">Login</a>
+        </div>
+        <div class="footer-contact">
+            <a href="mailto:kasumbakevin123@gmail.com">kasumbakevin123@gmail.com</a>
+            ·
+            <a href="https://wa.me/256751761977" target="_blank" rel="noopener">+256 751 761 977</a>
+        </div>
+    </div>
+    <div class="container footer-note">
+        Admission guidance is based on verified official documents where available. Cut-off points and fees change
+        every academic year — always confirm with the university admissions office before applying.
+    </div>
+</footer>
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

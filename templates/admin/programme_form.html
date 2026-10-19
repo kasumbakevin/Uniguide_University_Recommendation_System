@@ -1,0 +1,158 @@
+{% extends "admin/_layout.html" %}
+{% set fd = form_data if form_data else {} %}
+{% block title %}{{ 'Edit' if programme else 'Add' }} Programme - Admin{% endblock %}
+{% block admin_content %}
+
+<div class="page-banner">
+    <div>
+        <h1>{{ 'Edit' if programme else 'Add' }} Programme</h1>
+        <p>Entry requirements, cut-off points, fees and admission year.</p>
+    </div>
+    <a class="btn btn-ghost" href="{{ url_for('admin.programmes') }}">Back to list</a>
+</div>
+
+<form method="post" class="profile-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <section class="form-section">
+        <div class="field">
+            <label>University</label>
+            {% set selected_uni = fd.get('university_id', programme.university_id if programme else '') %}
+            <select name="university_id" required>
+                <option value="">— select —</option>
+                {% for university in universities %}
+                    <option value="{{ university.id }}" {{ 'selected' if selected_uni == university.id|string }}>{{ university.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="field">
+            <label>Programme name</label>
+            <input type="text" name="name" required maxlength="200"
+                   value="{{ fd.get('name', programme.name if programme else '') }}"
+                   placeholder="e.g. Bachelor of Information Technology">
+        </div>
+        <div class="field-row">
+            <div class="field">
+                <label>Level</label>
+                {% set selected_level = fd.get('level', programme.level if programme else 'Bachelor') %}
+                <select name="level">
+                    {% for lvl in ['Bachelor', 'Diploma', 'Certificate', 'Postgraduate'] %}
+                        <option value="{{ lvl }}" {{ 'selected' if selected_level == lvl }}>{{ lvl }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field">
+                <label>Qualification level</label>
+                {% set selected_ql = fd.get('qualification_level', programme.qualification_level if programme else 'UACE') %}
+                <select name="qualification_level">
+                    {% for ql in ['UACE', 'UACE/International', 'International'] %}
+                        <option value="{{ ql }}" {{ 'selected' if selected_ql == ql }}>{{ ql }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field">
+                <label>Duration (years)</label>
+                <input type="number" name="duration_years" min="1" max="7"
+                       value="{{ fd.get('duration_years', programme.duration_years if programme else 3) }}">
+            </div>
+        </div>
+    </section>
+
+    <section class="form-section">
+        <h2>Entry requirements</h2>
+        <div class="field">
+            <label>Essential subjects <span class="muted">(semicolon-separated)</span></label>
+            <input type="text" name="essential_subjects" maxlength="255"
+                   value="{{ fd.get('essential_subjects', programme.essential_subjects if programme else '') }}"
+                   placeholder="e.g. Biology;Chemistry">
+            <p class="field-hint">Compulsory subjects — a student missing any of these is not eligible.</p>
+        </div>
+        <div class="field">
+            <label>Relevant subjects <span class="muted">(optional, semicolon-separated)</span></label>
+            <input type="text" name="relevant_subjects" maxlength="255"
+                   value="{{ fd.get('relevant_subjects', programme.relevant_subjects if programme else '') }}">
+        </div>
+        <div class="field">
+            <label>Minimum grades <span class="muted">(Subject:Grade; semicolon-separated)</span></label>
+            <input type="text" name="minimum_grades" maxlength="255"
+                   value="{{ fd.get('minimum_grades', programme.minimum_grades if programme else '') }}"
+                   placeholder="e.g. Biology:C;Chemistry:C;Physics:D">
+        </div>
+        <div class="field-row">
+            <div class="field">
+                <label>Principal passes required</label>
+                <input type="number" name="principal_passes" min="0" max="4"
+                       value="{{ fd.get('principal_passes', programme.principal_passes if programme else 2) }}">
+            </div>
+            <div class="field">
+                <label>Required UCE</label>
+                <input type="text" name="uce_requirement" maxlength="255"
+                       value="{{ fd.get('uce_requirement', programme.uce_requirement if programme else '') }}"
+                       placeholder="e.g. 6 credits incl English and Maths">
+            </div>
+        </div>
+    </section>
+
+    <section class="form-section">
+        <h2>Cut-off points &amp; fees ({{ fd.get('admission_year', programme.admission_year if programme else '2026/27') or '2026/27' }})</h2>
+        <div class="field-row">
+            <div class="field">
+                <label>Government cut-off</label>
+                <input type="number" name="cutoff_government"
+                       value="{{ fd.get('cutoff_government', programme.cutoff_government if programme and programme.cutoff_government is not none else '') }}">
+            </div>
+            <div class="field">
+                <label>Private cut-off</label>
+                <input type="number" name="cutoff_private"
+                       value="{{ fd.get('cutoff_private', programme.cutoff_private if programme and programme.cutoff_private is not none else '') }}">
+            </div>
+            <div class="field">
+                <label>Foreign min. total</label>
+                <input type="number" name="foreign_min_total"
+                       value="{{ fd.get('foreign_min_total', programme.foreign_min_total if programme and programme.foreign_min_total is not none else '') }}">
+            </div>
+        </div>
+        <div class="field-row">
+            <div class="field">
+                <label>Tuition — government (UGX/yr)</label>
+                <input type="number" name="tuition_government" min="0"
+                       value="{{ fd.get('tuition_government', programme.tuition_government if programme and programme.tuition_government is not none else '') }}">
+            </div>
+            <div class="field">
+                <label>Tuition — private (UGX/yr)</label>
+                <input type="number" name="tuition_private" min="0"
+                       value="{{ fd.get('tuition_private', programme.tuition_private if programme and programme.tuition_private is not none else '') }}">
+            </div>
+        </div>
+        <div class="field-row">
+            <div class="field">
+                <label>Admission year</label>
+                <input type="text" name="admission_year" placeholder="2026/27"
+                       value="{{ fd.get('admission_year', programme.admission_year if programme else '') }}">
+                <p class="field-hint">Format YYYY/YY, e.g. 2026/27.</p>
+            </div>
+            <div class="field">
+                <label>Official source (URL)</label>
+                <input type="url" name="official_source"
+                       value="{{ fd.get('official_source', programme.official_source if programme else '') }}"
+                       placeholder="https://...">
+            </div>
+        </div>
+        <label class="check-item">
+            <input type="checkbox" name="international_eligible"
+                   {{ 'checked' if fd.get('international_eligible', 'on' if not programme or programme.international_eligible else '') }}>
+            International applicants accepted
+        </label>
+        <label class="check-item">
+            <input type="checkbox" name="active"
+                   {{ 'checked' if fd.get('active', 'on' if not programme or programme.active else '') }}>
+            Active
+        </label>
+    </section>
+
+    <div class="form-actions">
+        <button class="btn btn-primary" type="submit">{{ 'Save Changes' if programme else 'Add Programme' }}</button>
+        <a class="btn btn-ghost" href="{{ url_for('admin.programmes') }}">Cancel</a>
+    </div>
+</form>
+
+{% endblock %}

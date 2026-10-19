@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Login - UniGuide Uganda{% endblock %}
+{% block content %}
+
+<div class="auth-page">
+    <div class="auth-card">
+        <div class="auth-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M22 10 12 5 2 10l10 5 10-5z"></path>
+                <path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"></path>
+            </svg>
+        </div>
+        <h1>Welcome Back!</h1>
+        <p class="muted center">Log in to continue finding your best university match.</p>
+
+        <form method="post" action="{{ url_for('auth.login') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="field">
+                <label for="email">Email or username</label>
+                <input type="text" id="email" name="email" value="{{ email }}" required autocomplete="username" placeholder="you@example.com or admin">
+            </div>
+            <div class="field">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="Your password">
+            </div>
+            <button class="btn btn-primary btn-block" type="submit">Login</button>
+        </form>
+
+        <p class="auth-switch">New to UniGuide? <a href="{{ url_for('auth.register') }}">Create an account</a></p>
+    </div>
+</div>
+
+{% endblock %}

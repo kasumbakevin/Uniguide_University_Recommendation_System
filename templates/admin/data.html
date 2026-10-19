@@ -1,0 +1,170 @@
+{% extends "admin/_layout.html" %}
+{% from "admin/_bits.html" import delete_form with context %}
+{% block title %}Data Pipeline - Admin{% endblock %}
+{% block admin_content %}
+
+<div class="page-banner">
+    <div>
+        <h1>Data Pipeline</h1>
+        <p>Upload source files, run the extraction / cleaning pipeline and inspect the quality report.</p>
+    </div>
+</div>
+
+<div class="admin-menu">
+    <a class="btn btn-outline" href="{{ url_for('admin.data_overview') }}">Data</a>
+    <a class="btn btn-outline" href="{{ url_for('admin.models_overview') }}">Models</a>
+    <a class="btn btn-outline" href="{{ url_for('admin.predict') }}">Predict</a>
+    <a class="btn btn-ghost" href="{{ url_for('admin.import_data') }}">Import dataset</a>
+</div>
+
+<div class="card">
+    <h2>Run the pipeline</h2>
+    <p>Reads <code>data/</code> and <code>data/Unicast datasets/</code> (read-only) and writes cleaned,
+       merged outputs into <code>data/processed/&lt;run-id&gt;/</code>.</p>
+    <form method="post" action="{{ url_for('admin.data_run') }}"
+          onsubmit="return confirm('Run the full data pipeline? This reads source files and writes a new processed run.')">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn btn-primary" type="submit">Run pipeline</button>
+    </form>
+</div>
+
+<div class="card">
+    <h2>Upload a source file</h2>
+    <p>CSV, Excel or PDF up to 25 MB. Files are stored in <code>data/uploads/</code> and merged on the next run.</p>
+    <form method="post" action="{{ url_for('admin.data_upload') }}" enctype="multipart/form-data" class="profile-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <section class="form-section">
+            <div class="field">
+                <label>Source file</label>
+                <input type="file" name="dataset" accept=".csv,.xls,.xlsx,.pdf" required>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-outline" type="submit">Upload</button>
+            </div>
+        </section>
+    </form>
+    {% if not uploads %}
+    <p class="muted">No uploads yet.</p>
+    {% else %}
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead><tr><th>File</th><th>Type</th><th>Size</th><th>Uploaded</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+            {% for u in uploads %}
+                <tr>
+                    <td>{{ u.filename }}</td>
+                    <td>{{ u.filetype }}</td>
+                    <td>{{ u.size_bytes }} B</td>
+                    <td>{{ u.uploaded_at.strftime('%d %b %Y %H:%M') if u.uploaded_at else '' }}</td>
+                    <td><span class="badge badge-on">{{ u.status }}</span></td>
+                    <td class="row-actions">
+                        <a class="text-link" href="{{ url_for('admin.data_preview', upload_id=u.id) }}">Preview</a>
+                        {{ delete_form(url_for('admin.data_upload_delete', upload_id=u.id), u.filename) }}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>Processed runs</h2>
+    {% if not runs %}
+        <p class="muted">No runs yet. Run the pipeline above to create the first one.</p>
+    {% else %}
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead><tr><th>Run ID</th><th>Files</th><th>Key counts</th><th>Finished</th><th>Download</th></tr></thead>
+                <tbody>
+                {% for run in runs %}
+                    <tr>
+                        <td><code>{{ run.run_id }}</code>{% if loop.index0 == 0 %} <span class="enquiry-category">latest</span>{% endif %}</td>
+                        <td>{{ run.files }}</td>
+                        <td class="muted">{{ run.counts }}</td>
+                        <td>{{ run.finished_at or '—' }}</td>
+                        <td>
+                            <a href="{{ url_for('admin.data_download', run_id=run.run_id, filename='uniguide_training_dataset.csv') }}">training</a> ·
+                            <a href="{{ url_for('admin.data_download', run_id=run.run_id, filename='extracted_cutoffs.csv') }}">cut-offs</a> ·
+                            <a href="{{ url_for('admin.data_download', run_id=run.run_id, filename='uniguide_data_quality_report.csv') }}">quality</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</div>
+
+{% if db_runs %}
+<div class="card">
+    <h2>Pipeline run records <span class="muted">(database)</span></h2>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead><tr><th>Run</th><th>Status</th><th>Created by</th><th>When</th><th>Actions</th></tr></thead>
+            <tbody>
+            {% for r in db_runs %}
+                <tr>
+                    <td><code>{{ r.run_id }}</code></td>
+                    <td>{{ r.status }}</td>
+                    <td>{{ r.created_by or '—' }}</td>
+                    <td>{{ r.created_at.strftime('%d %b %Y %H:%M') if r.created_at else '' }}</td>
+                    <td class="row-actions">
+                        {{ delete_form(url_for('admin.data_run_delete', run_id=r.id), r.run_id) }}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <p class="muted">Deleting a run record keeps the files in data/processed/ — only the database
+       entry is removed.</p>
+</div>
+{% endif %}
+
+{% if quality %}
+<div class="card">
+    <h2>Data quality report {% if latest %}<span class="muted">({{ latest.run_id }})</span>{% endif %}</h2>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead><tr><th>Dataset</th><th>Check</th><th>Status</th><th>Count</th><th>Detail</th></tr></thead>
+                <tbody>
+            {% for row in quality %}
+                <tr>
+                    <td>{{ row.dataset }}</td>
+                    <td>{{ row.check }}</td>
+                    <td>{{ row.status }}</td>
+                    <td>{{ row.count }}</td>
+                    <td class="muted">{{ row.detail }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+{% if inventory %}
+<div class="card">
+    <h2>Source inventory <span class="muted">({{ inventory|length }} files, read-only)</span></h2>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead><tr><th>File</th><th>Type</th><th>Size (KB)</th><th>Role</th><th>Notes</th></tr></thead>
+            <tbody>
+            {% for f in inventory %}
+                <tr>
+                    <td>{{ f.file }}</td>
+                    <td>{{ f.type }}</td>
+                    <td>{{ f.size_kb }}</td>
+                    <td>{{ f.relevance }}</td>
+                    <td class="muted">{{ f.notes }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

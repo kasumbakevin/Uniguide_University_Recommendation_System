@@ -1,0 +1,101 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Predict - Admin{% endblock %}
+{% block admin_content %}
+
+<div class="page-banner">
+    <div>
+        <h1>Test a Prediction</h1>
+        <p>Run the trained discipline classifier and the content recommender against a live input.</p>
+    </div>
+</div>
+
+<div class="admin-menu">
+    <a class="btn btn-outline" href="{{ url_for('admin.data_overview') }}">Data</a>
+    <a class="btn btn-outline" href="{{ url_for('admin.models_overview') }}">Models</a>
+    <a class="btn btn-primary" href="{{ url_for('admin.predict') }}">Predict</a>
+    <a class="btn btn-ghost" href="{{ url_for('admin.dashboard') }}">Back to dashboard</a>
+</div>
+
+<div class="card">
+    <form method="post" class="profile-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <section class="form-section">
+            <div class="field">
+                <label>Programme name</label>
+                <input name="programme" type="text" value="{{ form.programme }}"
+                       placeholder="Bachelor of Science in Software Engineering" required>
+            </div>
+            <div class="field-row">
+                <div class="field">
+                    <label>Institution</label>
+                    <input name="institution" type="text" value="{{ form.institution }}" placeholder="Makerere University">
+                </div>
+                <div class="field">
+                    <label>Qualification level</label>
+                    <input name="qualification_level" type="text" value="{{ form.qualification_level }}">
+                </div>
+                <div class="field">
+                    <label>Institution type</label>
+                    <input name="institution_type" type="text" value="{{ form.institution_type }}">
+                </div>
+            </div>
+        </section>
+        <div class="form-actions">
+            <button class="btn btn-primary" type="submit">Predict</button>
+        </div>
+    </form>
+</div>
+
+{% if result and not result.error %}
+<div class="card">
+    <h2>Predicted discipline: {{ result.predicted_discipline }}</h2>
+    <p class="muted">Model {{ result.model }} · trained {{ result.trained_at }}</p>
+    {% if result.top_probabilities %}
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead><tr><th>Candidate discipline</th><th>Probability</th></tr></thead>
+            <tbody>
+            {% for p in result.top_probabilities %}
+                <tr><td>{{ p.discipline }}</td><td>{{ p.probability }}</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <h3>Similar programmes</h3>
+    {% if recommendation and not recommendation.error %}
+    <ul class="dot-list">
+        {% for item in recommendation.items %}
+        <li><strong>{{ item.programme }}</strong> — {{ item.institution }} (score {{ item.score }})</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p class="muted">{{ recommendation.error if recommendation else 'No recommender available.' }}</p>
+    {% endif %}
+</div>
+{% elif result %}
+<div class="card"><p class="muted">{{ result.error }}</p></div>
+{% endif %}
+
+{% if logs %}
+<div class="card">
+    <h2>Recent prediction log</h2>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead><tr><th>Time</th><th>Input</th><th>Output</th></tr></thead>
+            <tbody>
+            {% for log in logs %}
+                <tr>
+                    <td>{{ log.created_at.strftime('%d %b %H:%M') if log.created_at else '' }}</td>
+                    <td class="muted">{{ log.input_summary }}</td>
+                    <td class="muted">{{ log.output_summary }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

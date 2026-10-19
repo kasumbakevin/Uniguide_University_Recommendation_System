@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% from "_macros.html" import university_logo with context %}
+{% block title %}{{ university.name }} - UniGuide Uganda{% endblock %}
+{% block content %}
+
+<div class="page-banner university-banner">
+    <div class="university-head">
+        {{ university_logo(university, 'large') }}
+        <div>
+            <h1>{{ university.name }}</h1>
+            <p class="muted">
+                {{ university.location or university.district or university.region }} ·
+                {{ university.institution_type.title() }} university
+                {% if university.established %} · established {{ university.established }}{% endif %}
+            </p>
+            <div class="banner-actions">
+                {% if university.website %}
+                    <a class="btn btn-outline btn-sm" href="{{ university.website }}" target="_blank" rel="noopener">Official website</a>
+                {% endif %}
+                {% if university.application_link %}
+                    <a class="btn btn-primary btn-sm" href="{{ university.application_link }}" target="_blank" rel="noopener">Apply online</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="section">
+    <div class="section-head">
+        <h2>Programmes at {{ university.name }}</h2>
+        <p>Admission requirements for the {{ '2026/27' }} academic year where published.</p>
+    </div>
+
+    <div class="programme-list">
+        {% for programme in programmes %}
+            <div class="programme-row">
+                <div>
+                    <h3>{{ programme.name }}</h3>
+                    <p class="muted">{{ programme.level }} · {{ programme.duration_years }} years ·
+                        {{ programme.qualification_level }} entry</p>
+                    {% if programme.essential_list() %}
+                        <p><strong>Essential subjects:</strong> {{ programme.essential_list()|join(', ') }}</p>
+                    {% endif %}
+                    {% if programme.minimum_grades %}
+                        <p class="muted">Minimum grades: {{ programme.minimum_grades }}</p>
+                    {% endif %}
+                    <p class="muted">Principal passes: {{ programme.principal_passes }}</p>
+                </div>
+                <div class="programme-side">
+                    {% if programme.cutoff_government %}
+                        <div class="cutoff-chip">Gov cut-off: {{ programme.cutoff_government }}</div>
+                    {% endif %}
+                    {% if programme.cutoff_private %}
+                        <div class="cutoff-chip cutoff-private">Private cut-off: {{ programme.cutoff_private }}</div>
+                    {% endif %}
+                    {% if programme.tuition_private %}
+                        <p class="muted">Private fees: UGX {{ programme.tuition_private|money }} / year</p>
+                    {% endif %}
+                    {% if not programme.fees_verified %}
+                        <p class="fee-hint">Fees unverified — confirm with the university</p>
+                    {% endif %}
+                </div>
+            </div>
+        {% else %}
+            <p>No programmes listed for this university yet.</p>
+        {% endfor %}
+    </div>
+</section>
+
+{% endblock %}

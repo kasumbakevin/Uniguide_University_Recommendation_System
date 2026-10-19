@@ -1,0 +1,394 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Settings - Admin{% endblock %}
+{% block admin_content %}
+
+<div class="page-banner">
+    <div>
+        <h1>Settings</h1>
+        <p>System, account, recommendation, dataset and appearance options for {{ site_name }}.</p>
+    </div>
+    <a class="btn btn-ghost" href="{{ url_for('main.index') }}">View Website</a>
+</div>
+
+<nav class="settings-tabs">
+    {% for name, label in tabs %}
+        <a class="settings-tab {{ 'active' if active_tab == name }}"
+           href="{{ url_for('admin.settings', tab=name) }}">{{ label }}</a>
+    {% endfor %}
+</nav>
+
+{# ================= General ================= #}
+{% if active_tab == 'general' %}
+<div class="card">
+    <h2>General settings</h2>
+    <form method="post" action="{{ url_for('admin.settings_general') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="field-row">
+            <div class="field">
+                <label>System name</label>
+                <input type="text" name="site_name" required maxlength="80"
+                       value="{{ values.site_name }}">
+            </div>
+            <div class="field">
+                <label>Contact email</label>
+                <input type="email" name="contact_email" maxlength="120"
+                       value="{{ values.contact_email }}">
+            </div>
+            <div class="field">
+                <label>Contact phone</label>
+                <input type="text" name="contact_phone" maxlength="40"
+                       value="{{ values.contact_phone }}">
+            </div>
+        </div>
+        <div class="field">
+            <label>System description</label>
+            <textarea name="site_description" rows="2" maxlength="300">{{ values.site_description }}</textarea>
+        </div>
+        <div class="field-row">
+            <div class="field">
+                <label>Homepage image <span class="muted">(file in static/images/)</span></label>
+                <input type="text" name="homepage_image" maxlength="120" value="{{ values.homepage_image }}">
+            </div>
+            <div class="field">
+                <label>Default page size</label>
+                <input type="number" name="items_per_page" min="5" max="100" value="{{ values.items_per_page }}">
+                <p class="field-hint">Rows per page in admin tables (5–100).</p>
+            </div>
+            <div class="field">
+                <label>Date display</label>
+                <select name="date_format">
+                    {% for fmt, example in date_formats.items() %}
+                        <option value="{{ fmt }}" {{ 'selected' if values.date_format == fmt }}>{{ example }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-actions">
+            <button class="btn btn-primary" type="submit">Save Changes</button>
+        </div>
+    </form>
+</div>
+{% endif %}
+
+{# ================= Account ================= #}
+{% if active_tab == 'account' %}
+<div class="settings-grid">
+    <div class="card">
+        <h2>Admin profile</h2>
+        <p class="muted">Signed in as <strong>{{ current_email }}</strong></p>
+        <form method="post" action="{{ url_for('admin.settings_account') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="field">
+                <label>Full name</label>
+                <input type="text" name="name" required maxlength="120" value="{{ admin_user.name }}">
+            </div>
+            <div class="field">
+                <label>Username</label>
+                <input type="text" name="username" maxlength="80"
+                       value="{{ admin_user.username or '' }}">
+            </div>
+            <div class="field">
+                <label>Email</label>
+                <input type="email" name="email" required maxlength="120" value="{{ admin_user.email }}">
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-primary" type="submit">Save Changes</button>
+                <a class="btn btn-ghost" href="{{ url_for('auth.logout') }}">Logout</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>Change password</h2>
+        <form method="post" action="{{ url_for('admin.settings_password') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="field">
+                <label>Current password</label>
+                <input type="password" name="current_password" required autocomplete="current-password">
+            </div>
+            <div class="field">
+                <label>New password</label>
+                <input type="password" name="new_password" required minlength="8" autocomplete="new-password">
+                <p class="field-hint">At least 8 characters, with a letter and a number.
+                   Stored only as a hash.</p>
+            </div>
+            <div class="field">
+                <label>Confirm new password</label>
+                <input type="password" name="confirm_password" required minlength="8" autocomplete="new-password">
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-primary" type="submit">Change Password</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+{# ================= Universities & programmes ================= #}
+{% if active_tab == 'programmes' %}
+<div class="settings-grid">
+    <div class="card">
+        <h2>Admission cycle defaults</h2>
+        <form method="post" action="{{ url_for('admin.settings_programmes') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="field">
+                <label>Default admission year</label>
+                <input type="text" name="default_admission_year" value="{{ values.default_admission_year }}"
+                       placeholder="2026/27" pattern="\d{4}/\d{2}">
+                <p class="field-hint">Applied to new programmes when no year is typed.</p>
+            </div>
+            <div class="field">
+                <label>Student preference fields <span class="muted">(comma-separated)</span></label>
+                <textarea name="preference_fields" rows="3">{{ values.preference_fields }}</textarea>
+                <p class="field-hint">Shown to students as their “preferred field of study” choices.</p>
+            </div>
+            <label class="check-item">
+                <input type="checkbox" name="active_default"
+                       {{ 'checked' if values.programmes_active_by_default == '1' }}>
+                New programmes start as active
+            </label>
+            <div class="form-actions">
+                <button class="btn btn-primary" type="submit">Save Changes</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>Management shortcuts</h2>
+        <p class="muted">University and programme records themselves are managed here:</p>
+        <div class="admin-menu">
+            <a class="btn btn-outline" href="{{ url_for('admin.universities') }}">Manage Universities</a>
+            <a class="btn btn-outline" href="{{ url_for('admin.programmes') }}">Manage Programmes</a>
+            <a class="btn btn-outline" href="{{ url_for('admin.requirements') }}">Admission Requirements</a>
+            <a class="btn btn-ghost" href="{{ url_for('admin.careers') }}">Manage Careers</a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{# ================= Recommendation ================= #}
+{% if active_tab == 'recommendation' %}
+<div class="card">
+    <h2>Ranking weights</h2>
+    <p class="muted">These weights only change how <strong>already eligible</strong> programmes are
+       scored and ordered. They can never switch off a compulsory admission rule.</p>
+    <form method="post" action="{{ url_for('admin.settings_recommendation') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="field-row">
+            <div class="field">
+                <label>Essential subject points ×</label>
+                <input type="number" name="weight_essential" step="0.5" min="0" max="20"
+                       value="{{ values.weight_essential }}">
+            </div>
+            <div class="field">
+                <label>Relevant subject points ×</label>
+                <input type="number" name="weight_relevant" step="0.5" min="0" max="20"
+                       value="{{ values.weight_relevant }}">
+            </div>
+            <div class="field">
+                <label>Other subject points ×</label>
+                <input type="number" name="weight_other" step="0.5" min="0" max="20"
+                       value="{{ values.weight_other }}">
+            </div>
+            <div class="field">
+                <label>Subsidiary points ×</label>
+                <input type="number" name="weight_subsidiary" step="0.5" min="0" max="20"
+                       value="{{ values.weight_subsidiary }}">
+            </div>
+        </div>
+        <div class="field">
+            <label>Budget tolerance (%)</label>
+            <input type="number" name="budget_tolerance_pct" min="0" max="200"
+                   value="{{ values.budget_tolerance_pct }}">
+            <p class="field-hint">How far above the student's budget a programme may be before
+               it is marked as a poor budget fit.</p>
+        </div>
+
+        <h3>Preference matching</h3>
+        <div class="check-grid">
+            <label class="check-item"><input type="checkbox" name="use_budget_match"
+                {{ 'checked' if values.use_budget_match == '1' }}> Match on tuition budget</label>
+            <label class="check-item"><input type="checkbox" name="use_region_match"
+                {{ 'checked' if values.use_region_match == '1' }}> Match on preferred region</label>
+            <label class="check-item"><input type="checkbox" name="use_career_match"
+                {{ 'checked' if values.use_career_match == '1' }}> Match on career interests</label>
+            <label class="check-item"><input type="checkbox" name="use_fee_preference"
+                {{ 'checked' if values.use_fee_preference == '1' }}> Respect sponsorship / fee preference</label>
+        </div>
+        <div class="form-actions">
+            <button class="btn btn-primary" type="submit">Save Changes</button>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <h2>Compulsory admission rules <span class="muted">(read-only)</span></h2>
+    <p class="muted">These come from official university documents and are never affected by
+       ranking weights. Each row shows its source and academic year.</p>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr><th>Programme</th><th>University</th><th>Principal passes</th>
+                    <th>Minimum grades</th><th>Year</th><th>Source</th></tr>
+            </thead>
+            <tbody>
+                {% for row in eligibility_rules %}
+                    <tr>
+                        <td>{{ row.programme.name }}</td>
+                        <td>{{ row.university }}</td>
+                        <td>{{ row.programme.principal_passes }}</td>
+                        <td>{{ row.programme.minimum_grades or '—' }}</td>
+                        <td>{{ row.programme.admission_year or '—' }}</td>
+                        <td>{% if row.programme.official_source %}<a href="{{ row.programme.official_source }}" target="_blank" rel="noopener">Official</a>{% else %}<span class="badge badge-off">Missing</span>{% endif %}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <a class="text-link" href="{{ url_for('admin.requirements') }}">Manage admission requirements &rarr;</a>
+</div>
+{% endif %}
+
+{# ================= Dataset management ================= #}
+{% if active_tab == 'dataset' %}
+<div class="stat-grid">
+    <div class="stat-card"><strong>{{ dataset_summary.universities }}</strong><span>Universities</span></div>
+    <div class="stat-card"><strong>{{ dataset_summary.programmes }}</strong><span>Programmes</span></div>
+    <div class="stat-card"><strong>{{ dataset_summary.careers }}</strong><span>Careers</span></div>
+    <div class="stat-card"><strong>{{ dataset_summary.default_year }}</strong><span>Default admission year</span></div>
+</div>
+
+<div class="card">
+    <h2>Dataset tools</h2>
+    <div class="admin-menu">
+        <a class="btn btn-primary" href="{{ url_for('admin.import_data') }}">Import Data</a>
+        <a class="btn btn-outline" href="{{ url_for('admin.data_overview') }}">Upload &amp; preview files</a>
+        <a class="btn btn-ghost" href="{{ url_for('admin.export_csv', kind='universities') }}">Export universities</a>
+        <a class="btn btn-ghost" href="{{ url_for('admin.export_csv', kind='programmes') }}">Export programmes</a>
+        <a class="btn btn-ghost" href="{{ url_for('admin.export_csv', kind='careers') }}">Export careers</a>
+    </div>
+    <p class="muted">Re-importing upserts by name — existing records are updated, never dropped.
+       Uploads can be previewed (duplicates and invalid rows highlighted) before merging.</p>
+</div>
+
+<div class="settings-grid">
+    <div class="card">
+        <h2>Import history <span class="muted">(uploads)</span></h2>
+        {% if not dataset_summary.uploads %}
+            <div class="empty-state"><strong>No uploads yet</strong>Upload a CSV or Excel file from Dataset Management.</div>
+        {% else %}
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead><tr><th>File</th><th>Type</th><th>Size</th><th>When</th></tr></thead>
+                    <tbody>
+                    {% for u in dataset_summary.uploads %}
+                        <tr>
+                            <td>{{ u.filename }}</td>
+                            <td>{{ u.filetype }}</td>
+                            <td>{{ u.size_bytes }} B</td>
+                            <td>{{ u.uploaded_at.strftime('%d %b %Y %H:%M') if u.uploaded_at else '' }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+    <div class="card">
+        <h2>Pipeline runs</h2>
+        {% if not dataset_summary.runs %}
+            <div class="empty-state"><strong>No runs yet</strong>Run the pipeline from Dataset Management.</div>
+        {% else %}
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead><tr><th>Run</th><th>Status</th><th>When</th></tr></thead>
+                    <tbody>
+                    {% for r in dataset_summary.runs %}
+                        <tr>
+                            <td><code>{{ r.run_id }}</code></td>
+                            <td>{{ r.status }}</td>
+                            <td>{{ r.created_at.strftime('%d %b %Y %H:%M') if r.created_at else '' }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+{# ================= Appearance ================= #}
+{% if active_tab == 'appearance' %}
+<div class="card">
+    <h2>Appearance</h2>
+    <form method="post" action="{{ url_for('admin.settings_appearance') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="field-row">
+            <div class="field">
+                <label>Theme</label>
+                <select name="theme">
+                    <option value="light" {{ 'selected' if values.theme == 'light' }}>Light</option>
+                    <option value="dark" {{ 'selected' if values.theme == 'dark' }}>Dark</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Homepage title <span class="muted">(optional override)</span></label>
+                <input type="text" name="homepage_title" maxlength="80" value="{{ values.homepage_title }}">
+            </div>
+            <div class="field">
+                <label>Homepage image <span class="muted">(file in static/images/)</span></label>
+                <input type="text" name="homepage_image" maxlength="120" value="{{ values.homepage_image }}">
+            </div>
+        </div>
+
+        <div class="field">
+            <label>Primary interface colour</label>
+            <input type="hidden" name="accent_color" id="accent-color-input" value="{{ values.accent_color }}">
+            <div class="swatch-row">
+                {% for colour in accent_choices %}
+                    <button class="swatch {{ 'selected' if values.accent_color == colour }}"
+                            type="button" data-accent="{{ colour }}"
+                            style="background: {{ colour }}" aria-label="{{ colour }}"></button>
+                {% endfor %}
+                <input type="color" value="{{ values.accent_color }}"
+                       onchange="document.getElementById('accent-color-input').value = this.value;
+                                 document.documentElement.style.setProperty('--green', this.value);">
+            </div>
+        </div>
+
+        <div class="check-grid">
+            <label class="check-item"><input type="checkbox" name="show_logos"
+                {{ 'checked' if values.show_university_logos == '1' }}> Show university logos</label>
+            <label class="check-item"><input type="checkbox" name="sidebar_compact"
+                {{ 'checked' if values.sidebar_compact == '1' }}> Compact admin sidebar</label>
+        </div>
+        <div class="form-actions">
+            <button class="btn btn-primary" type="submit">Save Changes</button>
+        </div>
+    </form>
+</div>
+{% endif %}
+
+{# ================= Activity logs ================= #}
+{% if active_tab == 'logs' %}
+<div class="card">
+    <h2>Recent administrator activity</h2>
+    {% if not recent %}
+        <div class="empty-state"><strong>No activity recorded yet</strong>Actions will appear here.</div>
+    {% else %}
+        {% for entry in recent %}
+            <div class="activity-item">
+                <span class="action-chip chip-{{ 'delete' if entry.action == 'delete' else 'create' if entry.action == 'create' else 'update' }}">{{ entry.action }}</span>
+                <div>
+                    <div><span class="activity-who">{{ entry.user.name if entry.user else 'System' }}</span> {{ entry.summary() }}</div>
+                    <div class="activity-time">{{ entry.created_at.strftime('%d %b %Y %H:%M') if entry.created_at else '' }}</div>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+    <a class="btn btn-outline" href="{{ url_for('admin.activity_logs') }}">Open full activity log</a>
+</div>
+{% endif %}
+
+{% endblock %}

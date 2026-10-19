@@ -1,0 +1,78 @@
+{% extends "admin/_layout.html" %}
+{% from "admin/_bits.html" import pagination with context %}
+{% block title %}Admission Requirements - Admin{% endblock %}
+{% block admin_content %}
+
+<div class="page-banner">
+    <div>
+        <h1>Admission Requirements</h1>
+        <p>Principal passes, essential subjects, minimum grades and cut-offs, with source and
+           verification status. These rules are compulsory and cannot be switched off in settings.</p>
+    </div>
+    <div class="banner-actions">
+        <a class="btn btn-outline" href="{{ url_for('admin.export_csv', kind='programmes') }}">Export CSV</a>
+        <a class="btn btn-primary" href="{{ url_for('admin.programme_add') }}">+ Add requirement</a>
+    </div>
+</div>
+
+<form class="table-controls" method="get" action="{{ url_for('admin.requirements') }}">
+    <input type="search" name="q" value="{{ q }}" placeholder="Search programme, university or subject…">
+    <select name="year">
+        <option value="">All admission years</option>
+        {% for y in years %}
+            <option value="{{ y }}" {{ 'selected' if year == y }}>{{ y }}</option>
+        {% endfor %}
+    </select>
+    <label class="check-item">
+        <input type="checkbox" name="incomplete" value="1" {{ 'checked' if incomplete }}> Missing details only
+    </label>
+    <button class="btn btn-sm btn-outline" type="submit">Apply</button>
+    <a class="btn btn-sm btn-ghost" href="{{ url_for('admin.requirements') }}">Reset</a>
+    <span class="result-count">{{ page_obj.total if page_obj else requirements|length }} result(s)</span>
+</form>
+
+{% if not requirements %}
+    <div class="empty-state">
+        <strong>No admission requirement records match</strong>
+        Clear the filters or add a requirement through a programme.
+    </div>
+{% else %}
+<div class="table-wrap">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Programme</th>
+                <th>University</th>
+                <th>Principal passes</th>
+                <th>Essential subjects</th>
+                <th>Minimum grades</th>
+                <th>Cut-off (Gov/Priv)</th>
+                <th>Year</th>
+                <th>Source</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for programme in requirements %}
+                <tr>
+                    <td><a href="{{ url_for('admin.programme_view', programme_id=programme.id) }}">{{ programme.name }}</a></td>
+                    <td>{{ programme.university.name if programme.university else '—' }}</td>
+                    <td>{{ programme.principal_passes if programme.principal_passes is not none else '—' }}</td>
+                    <td>{{ programme.essential_subjects or '—' }}</td>
+                    <td>{{ programme.minimum_grades or '—' }}</td>
+                    <td>{{ programme.cutoff_government if programme.cutoff_government is not none else '—' }}
+                        / {{ programme.cutoff_private if programme.cutoff_private is not none else '—' }}</td>
+                    <td>{{ programme.admission_year or '—' }}</td>
+                    <td>{% if programme.official_source %}<a href="{{ programme.official_source }}" target="_blank" rel="noopener">Source</a>{% else %}<span class="badge badge-off">Missing</span>{% endif %}</td>
+                    <td class="row-actions">
+                        <a class="text-link" href="{{ url_for('admin.programme_edit', programme_id=programme.id) }}">Edit</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{{ pagination(page_obj) }}
+{% endif %}
+
+{% endblock %}

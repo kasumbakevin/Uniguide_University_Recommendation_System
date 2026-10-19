@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Compare Universities - UniGuide Uganda{% endblock %}
+{% block content %}
+
+<div class="page-banner">
+    <div>
+        <h1>Compare Universities</h1>
+        <p>Select two or more universities to compare courses, fees, cut-off points and location.</p>
+    </div>
+</div>
+
+<div class="card compare-picker">
+    <h2>Choose universities to compare</h2>
+    <form method="post" action="{{ url_for('student.compare') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="check-grid compare-grid">
+            {% for university in universities %}
+                <label class="check-item">
+                    <input type="checkbox" name="university_ids" value="{{ university.id }}"
+                           {% if university.id in selected_ids %}checked{% endif %}>
+                    {{ university.name }}
+                    <span class="muted">— {{ university.location or university.region }}</span>
+                </label>
+            {% endfor %}
+        </div>
+        <button class="btn btn-primary" type="submit">Compare selected</button>
+    </form>
+</div>
+
+{% if rows %}
+    <section class="section">
+        <h2>Comparison</h2>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>University</th>
+                        <th>Type</th>
+                        <th>Location</th>
+                        <th>Programmes</th>
+                        <th>Private fees (UGX/yr)</th>
+                        <th>Lowest gov cut-off</th>
+                        <th>Apply</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('main.university_detail', university_id=row.university.id) }}">{{ row.university.name }}</a>
+                            </td>
+                            <td>{{ row.university.institution_type.title() }}</td>
+                            <td>{{ row.university.location or row.university.district }}</td>
+                            <td>
+                                {{ row.programmes|length }} total ·
+                                {{ row.gov_programmes }} government ·
+                                {{ row.private_programmes }} private
+                            </td>
+                            <td>
+                                {% if row.fee_min %}
+                                    {{ row.fee_min|money }} – {{ row.fee_max|money }}
+                                {% else %}
+                                    Not published
+                                {% endif %}
+                            </td>
+                            <td>{{ row.lowest_gov_cutoff if row.lowest_gov_cutoff else '—' }}</td>
+                            <td>
+                                {% if row.university.application_link %}
+                                    <a class="text-link" href="{{ row.university.application_link }}" target="_blank" rel="noopener">Apply →</a>
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+{% endif %}
+
+{% if history %}
+    <section class="section">
+        <h2>Your comparison history</h2>
+        <div class="history-list">
+            {% for entry in history %}
+                <div class="history-item">
+                    <span>{{ entry.university_ids|replace('[','')|replace(']','') }}</span>
+                    <span>Compared on {{ entry.created_at.strftime('%d %b %Y') }}</span>
+                    <a class="text-link" href="{{ url_for('student.compare', ids=entry.university_ids|replace('[','')|replace(']','')|replace(' ','')) }}">View again →</a>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+{% endif %}
+
+{% endblock %}

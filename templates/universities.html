@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% from "_macros.html" import university_logo with context %}
+{% block title %}Universities - UniGuide Uganda{% endblock %}
+{% block content %}
+
+<div class="page-banner">
+    <div>
+        <h1>Universities in Uganda</h1>
+        <p>Public and private universities verified in the UniGuide dataset.</p>
+    </div>
+</div>
+
+<div class="card-grid">
+    {% for university in universities %}
+        <a class="card university-card" href="{{ url_for('main.university_detail', university_id=university.id) }}">
+            {{ university_logo(university) }}
+            <h3>{{ university.name }}</h3>
+            <p class="muted">{{ university.location or university.district or university.region }}
+                {% if university.institution_type %} · {{ university.institution_type.title() }}{% endif %}
+                {% if university.established %} · est. {{ university.established }}{% endif %}
+            </p>
+            {% set count = university.programmes.filter_by(active=True).count() %}
+            <p>{{ count }} programme{{ 's' if count != 1 else '' }}</p>
+            <span class="text-link">View programmes →</span>
+        </a>
+    {% endfor %}
+</div>
+
+{% endblock %}

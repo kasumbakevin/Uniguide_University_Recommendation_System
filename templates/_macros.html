@@ -1,0 +1,11 @@
+{% macro university_logo(university, size='') %}
+    {% if show_logos|default(true) %}
+        {% if university.image %}
+            <img src="{{ url_for('static', filename='images/' + university.image) }}" alt="{{ university.name }} logo" class="university-logo {{ size }}">
+        {% else %}
+            <div class="university-avatar {{ size }}">{{ university.initials() }}</div>
+        {% endif %}
+    {% else %}
+        <div class="university-avatar {{ size }}">{{ university.initials() }}</div>
+    {% endif %}
+{% endmacro %}

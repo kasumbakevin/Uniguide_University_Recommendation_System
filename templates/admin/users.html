@@ -1,0 +1,69 @@
+{% extends "admin/_layout.html" %}
+{% from "admin/_bits.html" import pagination, delete_form, toggle_form with context %}
+{% block title %}Users - Admin{% endblock %}
+{% block admin_content %}
+
+<div class="page-banner">
+    <div>
+        <h1>Registered Users</h1>
+        <p>Manage student and administrator accounts. Passwords are never shown here.</p>
+    </div>
+</div>
+
+<form class="table-controls" method="get" action="{{ url_for('admin.users') }}">
+    <input type="search" name="q" value="{{ q }}" placeholder="Search name, email or username…">
+    <select name="role">
+        <option value="">All roles</option>
+        <option value="student" {{ 'selected' if role == 'student' }}>Students</option>
+        <option value="admin" {{ 'selected' if role == 'admin' }}>Administrators</option>
+    </select>
+    <button class="btn btn-sm btn-outline" type="submit">Apply</button>
+    <a class="btn btn-sm btn-ghost" href="{{ url_for('admin.users') }}">Reset</a>
+    <span class="result-count">{{ page_obj.total if page_obj else users|length }} result(s)</span>
+</form>
+
+{% if not users %}
+    <div class="empty-state">
+        <strong>No users match your search</strong>
+        Clear the filters to see all accounts.
+    </div>
+{% else %}
+<div class="table-wrap">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Registered</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.username or '—' }}</td>
+                    <td><span class="role-pill role-{{ user.role }}">{{ user.role }}</span></td>
+                    <td><span class="badge {{ 'badge-on' if user.active is not false else 'badge-off' }}">{{ 'Active' if user.active is not false else 'Deactivated' }}</span></td>
+                    <td>{{ user.created_at.strftime('%d %b %Y') if user.created_at else '—' }}</td>
+                    <td class="row-actions">
+                        <a class="text-link" href="{{ url_for('admin.user_edit', user_id=user.id) }}">Edit</a>
+                        {{ toggle_form(url_for('admin.user_toggle', user_id=user.id), user.active is not false,
+                                       label_on='Deactivate', label_off='Activate') }}
+                        {% if user.id != current_user.id %}
+                            {{ delete_form(url_for('admin.user_delete', user_id=user.id), user.name, require_typing=true) }}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{{ pagination(page_obj) }}
+{% endif %}
+
+{% endblock %}

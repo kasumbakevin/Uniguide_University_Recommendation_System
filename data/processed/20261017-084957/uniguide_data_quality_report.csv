@@ -1,0 +1,20 @@
+dataset,check,status,count,detail
+programmes,record_count,pass,75,75 record(s)
+programmes,required_field:university,pass,0,0 missing
+programmes,required_field:programme,pass,0,0 missing
+programmes,unique_key:university,warn,64,64 duplicate value(s)
+programmes,unique_key:programme,warn,17,17 duplicate value(s)
+programmes,academic_year,pass,0,"0 record(s) outside ['2024/25', '2025/26', '2026/27']"
+programmes,source_reference,pass,0,0 record(s) without a source
+programmes,grade_range,pass,0,0 out-of-range grade token(s)
+catalogues,record_count,pass,376,376 record(s)
+catalogues,required_field:university,pass,0,0 missing
+catalogues,required_field:programme,pass,0,0 missing
+nche_register,record_count,pass,3622,3622 record(s)
+nche_register,required_field:institution,pass,0,0 missing
+nche_register,required_field:programme,pass,0,0 missing
+nche_register,target_label,pass,0,0 record(s) without a target label
+training,record_count,pass,3622,3622 record(s)
+training,required_field:programme,pass,0,0 missing
+training,required_field:discipline,pass,0,0 missing
+training,target_label,pass,0,0 record(s) without a target label

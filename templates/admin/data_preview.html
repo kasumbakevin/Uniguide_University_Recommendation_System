@@ -1,0 +1,74 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Preview Upload - Admin{% endblock %}
+{% block admin_content %}
+
+<div class="page-banner">
+    <div>
+        <h1>Preview: {{ record.filename }}</h1>
+        <p>{{ record.size_bytes }} bytes · {{ record.filetype }} · uploaded
+           {{ record.uploaded_at.strftime('%d %b %Y %H:%M') if record.uploaded_at else '' }}</p>
+    </div>
+    <div class="banner-actions">
+        <a class="btn btn-ghost" href="{{ url_for('admin.data_overview') }}">Back to datasets</a>
+        <a class="btn btn-outline" href="{{ url_for('admin.import_data') }}">Import verified CSVs</a>
+    </div>
+</div>
+
+{% if errors %}
+<div class="card">
+    <h2>Validation errors</h2>
+    {% for error in errors %}<p class="flash flash-error">{{ error }}</p>{% endfor %}
+</div>
+{% endif %}
+
+<div class="stat-grid">
+    <div class="stat-card"><strong>{{ total }}</strong><span>Rows read (preview capped)</span></div>
+    <div class="stat-card"><strong>{{ flagged|length }}</strong><span>Duplicate / existing rows</span></div>
+    <div class="stat-card"><strong>{{ invalid }}</strong><span>Invalid rows in preview</span></div>
+</div>
+
+{% if flagged %}
+<div class="card">
+    <h2>Duplicate &amp; invalid records</h2>
+    <p class="muted">Rows matching an existing <strong>University + Course</strong> pair are updated
+       by an import (upsert) — nothing is deleted. Rows duplicated inside the file are imported once.</p>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead><tr><th>Row</th><th>Record</th><th>Issue</th></tr></thead>
+            <tbody>
+                {% for item in flagged %}
+                    <tr>
+                        <td>{{ item.row }}</td>
+                        <td>{{ item.label }}</td>
+                        <td><span class="badge badge-off">{{ item.reason }}</span></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<div class="card">
+    <h2>Row preview</h2>
+    {% if not rows %}
+        <div class="empty-state"><strong>No data rows found</strong>The file may be empty.</div>
+    {% else %}
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>{% for column in header %}<th>{{ column }}</th>{% endfor %}</tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                    <tr>
+                        {% for cell in row %}<td>{{ cell }}</td>{% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

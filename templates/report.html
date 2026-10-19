@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>UniGuide Uganda — Recommendation Report</title>
+    <style>
+        body { font-family: "Segoe UI", Arial, sans-serif; color: #1e293b; margin: 24px; }
+        h1 { color: #12345A; font-size: 22px; margin-bottom: 2px; }
+        .sub { color: #64748b; font-size: 12px; }
+        h2 { color: #12345A; font-size: 15px; border-bottom: 2px solid #18794E; padding-bottom: 4px; margin-top: 22px; }
+        .meta { font-size: 12px; }
+        .programme { border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; margin: 8px 0; page-break-inside: avoid; }
+        .programme h3 { margin: 0 0 4px; font-size: 14px; color: #12345A; }
+        .status-Eligible { color: #18794E; font-weight: bold; }
+        .status-Borderline { color: #b45309; font-weight: bold; }
+        .status-Not eligible { color: #b91c1c; font-weight: bold; }
+        ul { margin: 4px 0 4px 18px; padding: 0; font-size: 12px; }
+        .missing { color: #b91c1c; }
+        .note { font-size: 11px; color: #64748b; margin-top: 18px; border-top: 1px solid #e2e8f0; padding-top: 8px; }
+        .actions { margin: 12px 0; }
+        button { background: #18794E; color: white; border: 0; padding: 8px 16px; border-radius: 6px; font-size: 14px; cursor: pointer; }
+        @media print { .actions { display: none; } }
+    </style>
+</head>
+<body>
+<h1>UniGuide Uganda</h1>
+<p class="sub">University &amp; Course Recommendation Report for {{ current_user.name }} · Generated {{ now }}</p>
+<div class="actions"><button onclick="window.print()">Print / Save as PDF</button></div>
+
+<h2>Student snapshot</h2>
+<p class="meta">
+    Citizenship: {{ 'Foreigner' if profile_data.citizenship == 'foreign' else 'Ugandan' }} ·
+    Gender: {{ profile_data.gender or 'Not specified' }} ·
+    Academic record: {{ profile_data.uce_summary or 'Not provided' }} ·
+    Preferred field: {{ profile_data.preferred_field or 'All fields' }} ·
+    Budget: {{ 'UGX ' ~ (profile_data.budget|money) if profile_data.budget else 'Not provided' }} ·
+    Region: {{ profile_data.preferred_region or 'Any' }} ·
+    Sponsorship: {{ 'Government' if profile_data.sponsorship_pref == 'government' else 'Private' }}
+    {% if profile_data.sports_level %} · Sports: {{ profile_data.sports_level }} level{% if profile_data.sports_details %} ({{ profile_data.sports_details }}){% endif %}{% endif %}
+</p>
+
+<h2>Recommended programmes — admission information for {{ '2026/27' }}</h2>
+{% for item in results %}
+    <div class="programme">
+        <h3>{{ item.programme.name }} — {{ item.university.name }} <span class="status-{{ item.status }}">[{{ item.status }}]</span></h3>
+        <p class="meta">
+            {% if item.score is not none %}Weighted score / total: {{ item.score }} · {% endif %}
+            {% if item.cutoff is not none %}Required cut-off: {{ item.cutoff }} · {% endif %}
+            {% if item.tuition %}Tuition ({{ item.sponsorship|lower }}): UGX {{ item.tuition|money }} / year · {% endif %}
+            Duration: {{ item.programme.duration_years }} years · Suitability: {{ item.suitability }}%
+        </p>
+        <ul>
+            {% for reason in item.reasons %}<li>{{ reason }}</li>{% endfor %}
+        </ul>
+        {% if item.missing %}
+            <ul class="missing">
+                {% for note in item.missing %}<li>{{ note }}</li>{% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+{% endfor %}
+
+<p class="note">Cut-off points differ by university, programme, sponsorship scheme and admission year. This report uses
+official {{ '2026/27' }} admission documents where available. Always confirm eligibility with the university admissions
+office before applying.{% if results %} Source: {{ results[0].official_source }}.{% endif %}</p>
+</body>
+</html>

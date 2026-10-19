@@ -1,0 +1,58 @@
+{% extends "admin/_layout.html" %}
+{% from "admin/_bits.html" import pagination, delete_form with context %}
+{% block title %}Careers - Admin{% endblock %}
+{% block admin_content %}
+
+<div class="page-banner">
+    <div>
+        <h1>Careers</h1>
+        <p>Career paths used by the recommendation engine and the AI Guide chatbot.</p>
+    </div>
+    <a class="btn btn-primary" href="{{ url_for('admin.career_add') }}">+ Add New</a>
+</div>
+
+<form class="table-controls" method="get" action="{{ url_for('admin.careers') }}">
+    <input type="search" name="q" value="{{ q }}" placeholder="Search career name or description…">
+    <button class="btn btn-sm btn-outline" type="submit">Search</button>
+    <a class="btn btn-sm btn-ghost" href="{{ url_for('admin.careers') }}">Reset</a>
+    <span class="result-count">{{ page_obj.total if page_obj else careers|length }} result(s)</span>
+</form>
+
+{% if not careers %}
+    <div class="empty-state">
+        <strong>No careers match your search</strong>
+        Clear the search or add a new career.
+    </div>
+{% else %}
+<div class="table-wrap">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Career</th>
+                <th>Required subjects</th>
+                <th>Linked programmes</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for career in careers %}
+                <tr>
+                    <td>
+                        <strong>{{ career.name }}</strong>
+                        {% if career.description %}<div class="muted">{{ career.description[:110] }}{{ '…' if career.description|length > 110 }}</div>{% endif %}
+                    </td>
+                    <td>{{ career.required_subjects or '—' }}</td>
+                    <td>{{ career.programmes.count() }}</td>
+                    <td class="row-actions">
+                        <a class="text-link" href="{{ url_for('admin.career_edit', career_id=career.id) }}">Edit</a>
+                        {{ delete_form(url_for('admin.career_delete', career_id=career.id), career.name) }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{{ pagination(page_obj) }}
+{% endif %}
+
+{% endblock %}

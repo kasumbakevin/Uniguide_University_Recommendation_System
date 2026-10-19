@@ -1,0 +1,29 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Import Dataset - Admin{% endblock %}
+{% block admin_content %}
+
+<div class="page-banner">
+    <div>
+        <h1>Import Dataset</h1>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Re-import from the verified CSV dataset</h2>
+    <p>Upsert universities, programmes and careers from the files in <code>data/</code>:</p>
+    <ul class="dot-list">
+        <li><code>universities.csv</code></li>
+        <li><code>programmes.csv</code></li>
+        <li><code>careers.csv</code></li>
+    </ul>
+    <p class="muted">Existing records are matched by name and updated; new records are added.
+       <strong>Nothing is deleted</strong>, so admin edits to other records are preserved.
+       Re-import only overwrites fields that come from the CSVs.</p>
+    <form method="post" action="{{ url_for('admin.import_run') }}"
+          data-confirm="Re-import the verified CSVs? Existing records will be updated by name. No data is deleted.">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn btn-primary" type="submit">Import data</button>
+    </form>
+</div>
+
+{% endblock %}

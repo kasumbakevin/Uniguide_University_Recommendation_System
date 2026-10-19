@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% from "_macros.html" import university_logo with context %}
+{% block title %}Your Recommendations - UniGuide Uganda{% endblock %}
+{% block content %}
+
+<div class="page-banner">
+    <div>
+        <h1>Your Recommendations</h1>
+        <p>Based on your grades and preferences — ranked by how well each course matches you.</p>
+    </div>
+    <div class="banner-actions">
+        <a class="btn btn-ghost" href="{{ url_for('student.profile') }}">Edit profile</a>
+        <a class="btn btn-outline" href="{{ url_for('student.report_pdf') }}">Download PDF report</a>
+    </div>
+</div>
+
+<div class="result-summary">
+    <div class="summary-badge badge-eligible">{{ eligible }} Eligible</div>
+    <div class="summary-badge badge-borderline">{{ borderline }} Borderline</div>
+    <div class="summary-badge badge-noteligible">{{ not_eligible }} Not eligible</div>
+    <span class="summary-year">Admission information for academic year {{ admission_year }}</span>
+</div>
+
+<div class="result-list">
+    {% for item in results %}
+        {% set programme = item.programme %}
+        {% set university = item.university %}
+        {% set status = item.status %}
+        <article class="result-card {% if status == 'Eligible' %}result-eligible{% endif %}">
+            <div class="result-head">
+                <div class="result-university">
+                    {{ university_logo(university, 'small') }}
+                    <div>
+                        <span class="result-school">{{ university.name }}</span>
+                        <span class="result-location">
+                            {{ university.location or university.district or university.region }} ·
+                            {{ programme.duration_years }} years · {{ item.admission_year }}
+                        </span>
+                    </div>
+                </div>
+                <span class="status-badge badge-{{ status|lower|replace(' ', '-') }}">{{ status }}</span>
+            </div>
+
+            <h2 class="result-course">{{ programme.name }}</h2>
+
+            <div class="result-meta">
+                <span class="meta-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+                    Suitability
+                </span>
+                <span class="score">{{ item.suitability }}%</span>
+                <div class="progress"><div class="progress-fill {% if item.suitability >= 85 %}fill-strong{% elif item.suitability >= 60 %}fill-mid{% else %}fill-weak{% endif %}" style="width: {{ item.suitability }}%"></div></div>
+                <span class="meta-item muted">Score {{ item.score }}{% if item.cutoff %} / cutoff {{ item.cutoff }}{% endif %}</span>
+            </div>
+
+            <div class="result-grid">
+                <div class="requirements">
+                    <h3>Entry requirements</h3>
+                    {% if programme.essential_list() %}
+                        <p><strong>Essential:</strong> {{ programme.essential_list()|join(', ') }}</p>
+                    {% else %}
+                        <p><strong>Essential:</strong> Any principal subjects</p>
+                    {% endif %}
+                    {% if programme.relevant_list() %}
+                        <p><strong>Relevant:</strong> {{ programme.relevant_list()|join(', ') }}</p>
+                    {% endif %}
+                    <p><strong>Principal passes:</strong> {{ programme.principal_passes }}</p>
+                    {% if programme.minimum_grades %}
+                        <p class="muted">{{ programme.minimum_grades|replace(': ', ':') }}</p>
+                    {% endif %}
+                    {% if item.tuition %}
+                        <p><strong>Tuition ({{ item.sponsorship|lower }}):</strong> UGX {{ item.tuition|money }} / year</p>
+                    {% endif %}
+                </div>
+
+                <div class="reasons">
+                    <h3>Why this matches</h3>
+                    <ul class="reason-list">
+                        {% for reason in item.reasons %}
+                            <li>{{ reason }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% if item.missing %}
+                        <div class="missing-box">
+                            <h4>Needs attention</h4>
+                            <ul>
+                                {% for note in item.missing %}
+                                    <li>{{ note }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if programme.careers %}
+                <div class="careers-strip">
+                    <span class="careers-label">Careers:</span>
+                    {% for career in programme.careers[:4] %}
+                        <span class="career-tag">{{ career.name }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="result-actions">
+                {% if item.tuition and profile_budget and item.tuition > profile_budget %}
+                    <span class="fee-warning">Above your UGX {{ profile_budget|money }} budget</span>
+                {% endif %}
+                <form method="post" action="{{ url_for('student.save_recommendation', programme_id=programme.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button class="btn btn-ghost btn-sm" type="submit">
+                        {{ 'Save' if programme.id not in saved_ids else 'Saved ✓' }}
+                    </button>
+                </form>
+                <a class="btn btn-outline btn-sm" href="{{ url_for('main.university_detail', university_id=university.id) }}">View university</a>
+                <a class="btn btn-primary btn-sm" href="{{ item.application_link }}" target="_blank" rel="noopener">Apply online</a>
+            </div>
+
+            <div class="result-source">
+                Cut-off points and entry data are based on official {{ item.admission_year }} admission documents where available.
+                {% if item.official_source %}Source: <a href="{{ item.official_source }}" target="_blank" rel="noopener">{{ item.official_source }}</a>.{% endif %}
+            </div>
+        </article>
+    {% else %}
+        <div class="empty-state">
+            <h2>No courses found</h2>
+            <p>Try broadening your preferred field, or complete your academic profile first.</p>
+            <a class="btn btn-primary" href="{{ url_for('student.profile') }}">Edit my profile</a>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

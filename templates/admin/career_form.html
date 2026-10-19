@@ -1,0 +1,50 @@
+{% extends "admin/_layout.html" %}
+{% set fd = form_data if form_data else {} %}
+{% block title %}{{ 'Edit' if career else 'Add' }} Career - Admin{% endblock %}
+{% block admin_content %}
+
+<div class="page-banner">
+    <div>
+        <h1>{{ 'Edit' if career else 'Add' }} Career</h1>
+        <p>Career guidance shown in recommendations and the AI Guide.</p>
+    </div>
+    <a class="btn btn-ghost" href="{{ url_for('admin.careers') }}">Back to list</a>
+</div>
+
+<form method="post" class="profile-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <section class="form-section">
+        <div class="field">
+            <label>Career name</label>
+            <input type="text" name="name" required maxlength="160"
+                   value="{{ fd.get('name', career.name if career else '') }}">
+        </div>
+        <div class="field">
+            <label>Description</label>
+            <textarea name="description" rows="3">{{ fd.get('description', career.description if career else '') }}</textarea>
+        </div>
+        <div class="field">
+            <label>Required subjects <span class="muted">(semicolon-separated)</span></label>
+            <input type="text" name="required_subjects" maxlength="255"
+                   value="{{ fd.get('required_subjects', career.required_subjects if career else '') }}"
+                   placeholder="e.g. Mathematics;Computer Science">
+        </div>
+        <div class="field">
+            <label>Skills <span class="muted">(comma-separated)</span></label>
+            <input type="text" name="skills" maxlength="255"
+                   value="{{ fd.get('skills', career.skills if career else '') }}">
+        </div>
+        <div class="field">
+            <label>Career pathways</label>
+            <input type="text" name="pathways" maxlength="255"
+                   value="{{ fd.get('pathways', career.pathways if career else '') }}"
+                   placeholder="e.g. Junior Developer;Senior Developer">
+        </div>
+    </section>
+    <div class="form-actions">
+        <button class="btn btn-primary" type="submit">{{ 'Save Changes' if career else 'Add Career' }}</button>
+        <a class="btn btn-ghost" href="{{ url_for('admin.careers') }}">Cancel</a>
+    </div>
+</form>
+
+{% endblock %}

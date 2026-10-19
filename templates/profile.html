@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+{% block title %}Academic Profile - UniGuide Uganda{% endblock %}
+{% block content %}
+
+<div class="page-banner">
+    <div>
+        <h1>Academic Profile</h1>
+        <p>Enter your academic results and preferences. UniGuide matches you against verified course requirements.</p>
+    </div>
+</div>
+
+<form method="post" action="{{ url_for('student.profile') }}" class="profile-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <section class="form-section">
+        <h2>About you</h2>
+        <div class="field">
+            <label for="citizenship">I am a</label>
+            <select id="citizenship" name="citizenship" class="input-lg">
+                <option value="ugandan" {% if profile.citizenship != 'foreign' %}selected{% endif %}>Ugandan student (UACE / A-Level)</option>
+                <option value="foreign" {% if profile.citizenship == 'foreign' %}selected{% endif %}>Foreigner / international student</option>
+            </select>
+            <p class="field-hint">Ugandan students are matched using UACE subjects and weighted cut-off points.
+                International students use their qualification and NCHE minimum entry requirements.</p>
+        </div>
+        <div class="field">
+            <label for="gender">Gender</label>
+            <select id="gender" name="gender">
+                <option value="">Prefer not to say</option>
+                {% for gender in ctx.genders %}
+                    <option value="{{ gender }}" {% if profile.data.gender == gender %}selected{% endif %}>{{ gender }}</option>
+                {% endfor %}
+            </select>
+            <p class="field-hint">Optional. Used only for reporting and to make guidance more inclusive.</p>
+        </div>
+    </section>
+
+    <section class="form-section" id="uganda-fields">
+        <h2>Uganda A-Level results</h2>
+
+        <div class="field">
+            <label for="uce_summary">UCE (O-Level) summary</label>
+            <input type="text" id="uce_summary" name="uce_summary"
+                   value="{{ profile.data.uce_summary }}"
+                   placeholder="e.g. 6 credits including English and Mathematics">
+        </div>
+
+        {% set sub_names = profile.data.uace_subjects.keys() | list %}
+        {% set sub_grades = profile.data.uace_subjects.values() | list %}
+        <div class="subject-rows">
+            <div class="row-label">Principal subjects and grades</div>
+            {% for i in range(3) %}
+                <div class="subject-row">
+                    <select name="subject_{{ i + 1 }}" aria-label="Principal subject {{ i + 1 }}">
+                        <option value="">— Subject {{ i + 1 }} —</option>
+                        {% for subject in ctx.subjects %}
+                            <option value="{{ subject }}" {% if sub_names and sub_names[i] == subject %}selected{% endif %}>{{ subject }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="grade_{{ i + 1 }}" aria-label="Grade for subject {{ i + 1 }}">
+                        <option value="">Grade</option>
+                        {% for grade in ctx.grades %}
+                            <option value="{{ grade }}" {% if sub_names and sub_grades[i] == grade %}selected{% endif %}>{{ grade }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="subject-rows">
+            <div class="row-label">Subsidiary subjects (optional)</div>
+            {% set sub_dict = profile.data.uace_subsidiary %}
+            <div class="subject-row">
+                <label for="subsidiary_gp">General Paper</label>
+                <select id="subsidiary_gp" name="subsidiary_gp">
+                    <option value="">Grade</option>
+                    {% for grade in ctx.grades %}
+                        <option value="{{ grade }}" {% if sub_dict.get('General Paper') == grade %}selected{% endif %}>{{ grade }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="subject-row">
+                <label for="subsidiary_other">(Sub-Maths / ICT)</label>
+                <select id="subsidiary_other" name="subsidiary_other">
+                    <option value="">Grade</option>
+                    {% for grade in ctx.grades %}
+                        <option value="{{ grade }}" {% if sub_dict.get('Sub-Mathematics') == grade %}selected{% endif %}>{{ grade }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </section>
+
+    <section class="form-section hidden" id="foreign-fields">
+        <h2>International qualification</h2>
+        {% set foreign = profile.data.foreign %}
+        <div class="field">
+            <label for="foreign_type">Your qualification</label>
+            <select id="foreign_type" name="foreign_type">
+                {% for ftype in ctx.foreign_types %}
+                    <option value="{{ ftype }}" {% if foreign.get('type') == ftype %}selected{% endif %}>{{ ftype }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="field">
+            <label for="foreign_total">Overall score / total points</label>
+            <input type="number" id="foreign_total" name="foreign_total" min="0" step="any"
+                   value="{{ foreign.get('total', '') }}" placeholder="e.g. 15 for CIE, 26 for IB">
+            <p class="field-hint">For CIE A-Levels, total points of your best three subjects (A*=7, A=6, B=5, C=4, D=3, E=2).
+                For IB, your total points out of 45.</p>
+        </div>
+        <div class="field">
+            <label for="foreign_subjects">Subjects (optional)</label>
+            <input type="text" id="foreign_subjects" name="foreign_subjects"
+                   value="{{ foreign.get('subjects', '') }}" placeholder="e.g. Mathematics, Physics, Economics">
+        </div>
+    </section>
+
+    <section class="form-section">
+        <h2>Your preferences</h2>
+
+        <div class="field">
+            <label for="preferred_field">Preferred field of study</label>
+            <select id="preferred_field" name="preferred_field">
+                <option value="">All fields</option>
+                {% for field in ctx.fields %}
+                    <option value="{{ field }}" {% if profile.data.preferred_field == field %}selected{% endif %}>{{ field }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="field">
+            <label>Career interests</label>
+            <div class="check-grid">
+                {% for career in ctx.careers %}
+                    <label class="check-item">
+                        <input type="checkbox" name="career_interests" value="{{ career.name }}"
+                               {% if career.name in profile.data.career_interests %}checked{% endif %}>
+                        {{ career.name }}
+                    </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="field-row">
+            <div class="field">
+                <label for="budget">Annual tuition budget (UGX)</label>
+                <input type="number" id="budget" name="budget" min="0" step="100000"
+                       value="{{ profile.data.budget or '' }}" placeholder="e.g. 6000000">
+            </div>
+            <div class="field">
+                <label for="preferred_region">Preferred region</label>
+                <select id="preferred_region" name="preferred_region">
+                    <option value="">Any region</option>
+                    {% for region in ctx.regions %}
+                        <option value="{{ region }}" {% if profile.data.preferred_region == region %}selected{% endif %}>{{ region }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field">
+                <label for="sponsorship_pref">Sponsorship preference</label>
+                <select id="sponsorship_pref" name="sponsorship_pref">
+                    <option value="private" {% if profile.data.sponsorship_pref != 'government' %}selected{% endif %}>Private</option>
+                    <option value="government" {% if profile.data.sponsorship_pref == 'government' %}selected{% endif %}>Government</option>
+                </select>
+            </div>
+        </div>
+    </section>
+
+    <section class="form-section">
+        <h2>Sports &amp; extra-curricular</h2>
+        <div class="field-row">
+            <div class="field">
+                <label for="sports_level">Highest level of sports participation</label>
+                <select id="sports_level" name="sports_level">
+                    <option value="">Not applicable</option>
+                    {% for level in ctx.sports_levels %}
+                        <option value="{{ level }}" {% if profile.data.sports_level == level %}selected{% endif %}>{{ level }}{% if level == 'National' %} level{% endif %}</option>
+                    {% endfor %}
+                </select>
+                <p class="field-hint">Choose <strong>National</strong> if you have represented your school, district or country at a national-level competition.</p>
+            </div>
+            <div class="field">
+                <label for="sports_details">Sport(s) &amp; achievements (optional)</label>
+                <input type="text" id="sports_details" name="sports_details"
+                       value="{{ profile.data.sports_details }}"
+                       placeholder="e.g. Athletics (800m) — national schools champion">
+            </div>
+        </div>
+    </section>
+
+    <div class="form-actions">
+        <button class="btn btn-primary btn-lg" type="submit">Save profile &amp; get recommendations</button>
+    </div>
+</form>
+
+{% endblock %}

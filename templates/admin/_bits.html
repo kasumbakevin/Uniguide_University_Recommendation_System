@@ -1,0 +1,42 @@
+{% macro pagination(page_obj) %}
+{% if page_obj and page_obj.pages > 1 %}
+{% set args = request.args.to_dict() %}
+{% set _ = args.pop('page', none) %}
+<nav class="pagination" aria-label="Pagination">
+    {% if page_obj.has_prev %}
+        <a href="{{ url_for(request.endpoint, page=page_obj.prev_num, **args) }}">&larr; Previous</a>
+    {% endif %}
+    {% for p in page_obj.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+        {% if p %}
+            <a class="{{ 'page-current' if p == page_obj.page else '' }}"
+               href="{{ url_for(request.endpoint, page=p, **args) }}">{{ p }}</a>
+        {% else %}
+            <span class="page-ellipsis">&hellip;</span>
+        {% endif %}
+    {% endfor %}
+    {% if page_obj.has_next %}
+        <a href="{{ url_for(request.endpoint, page=page_obj.next_num, **args) }}">Next &rarr;</a>
+    {% endif %}
+</nav>
+{% endif %}
+{% endmacro %}
+
+{% macro delete_form(endpoint, record_name, label='Delete', button_class='link-danger', require_typing=false) %}
+<form method="post" action="{{ endpoint }}" class="inline-form"
+      {% if require_typing %}data-prompt="{{ record_name }}"
+      data-confirm="Permanently delete '{{ record_name }}'?&#10;You will be asked to type its exact name to confirm."
+      {% else %}
+      data-confirm="Delete '{{ record_name }}' permanently?&#10;This cannot be undone."
+      {% endif %}>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="confirm_name" value="{{ '' if require_typing else record_name }}">
+    <button class="{{ button_class }}" type="submit">{{ label }}</button>
+</form>
+{% endmacro %}
+
+{% macro toggle_form(endpoint, is_active, label_on='Deactivate', label_off='Activate') %}
+<form method="post" action="{{ endpoint }}" class="inline-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="btn btn-sm btn-ghost" type="submit">{{ label_on if is_active else label_off }}</button>
+</form>
+{% endmacro %}

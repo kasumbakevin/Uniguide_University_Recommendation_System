@@ -1,0 +1,20 @@
+file,pages,status,rows,method,notes
+CUT-OFF-Points-Mak-MUBS-National-Merit-Admissions-2022-2023.pdf,4,no_rows,0,,No programme cut-off rows detected.
+CUT-OFF-Points-Mak-MUBS-National-Merit-Admissions-2023-2024.pdf,3,extracted,53,table,"3 page(s) with text, 2 with tables."
+Cut-Off-Points-DIRECT_ENTRY-Private-Sponsorship-2025-2026.pdf,6,extracted,116,table+text,"6 page(s) with text, 3 with tables."
+Cut-Off-Points-DIRECT_ENTRY-Private-Sponsorship-2026-2027.pdf,7,extracted,120,table+text,"7 page(s) with text, 2 with tables."
+Cut-Off-Points-Government-Sponsorship-2014-15.pdf,5,extracted,142,table+text,"5 page(s) with text, 1 with tables."
+Cut-Off-Points-Mak-MUBS-Private-Sponsorship-2022-2023.pdf,5,extracted,89,table+text,"5 page(s) with text, 1 with tables."
+Cut-Off-Points-Mak-MUBS-Private-Sponsorship-2023-2024.pdf,7,extracted,161,table,"7 page(s) with text, 7 with tables."
+Cut-Off-Points-Private-Sponsorship-2014-2015 (1).pdf,6,extracted,201,table,"6 page(s) with text, 6 with tables."
+Cut-Off-Points-Private-Sponsorship-2014-2015.pdf,6,extracted,201,table,"6 page(s) with text, 6 with tables."
+Cut-Off-Points-Private-Sponsorship-2024-2025.pdf.pdf,8,extracted,166,table,"8 page(s) with text, 8 with tables."
+Mak-DRGT-Postgraduate-Programmes-Fees-Structure-2024-2025AY.pdf,8,needs_review,0,,Scanned/image-only PDF - flagged for human review.
+Mak-MUBS-Government-Sponsorship-CUT-OFF-POINTS-2024-2025_0.pdf,3,extracted,41,table+text,"3 page(s) with text, 1 with tables."
+Mak-Undergraduate-Programmes-Fees-Structure-2024-2025AY.pdf,7,extracted,3,text,3 fee row(s) parsed from text.
+Makerere-Private-Cut-Off-Points-2012-13.pdf,11,extracted,208,table+text,"11 page(s) with text, 1 with tables."
+Makerere-University-NATIONAL-MERIT-SCHOLARSHIP-CUT-OFF POINTS-2025-2026.pdf,3,extracted,21,text,"3 page(s) with text, 0 with tables."
+Makerere-University-NATIONAL-MERIT-SCHOLARSHIP-CUT-OFF POINTS-2026-2027 (1).pdf,3,needs_review,0,,"Scanned/image-only PDF - no selectable text, OCR not available. Flagged for human review."
+Makerere-University-NATIONAL-MERIT-SCHOLARSHIP-CUT-OFF POINTS-2026-2027.pdf,3,needs_review,0,,"Scanned/image-only PDF - no selectable text, OCR not available. Flagged for human review."
+MoES-PUJAB-Info-2014-15-Mak-Cut-Off-Points-2010-2013.pdf,3,no_rows,0,,No programme cut-off rows detected.
+UNIVERSITIES_-AND_OTHER_TERTIARY_INSTITUTIONS_ACT.pdf,,skipped,0,,not a cut-off or fee document

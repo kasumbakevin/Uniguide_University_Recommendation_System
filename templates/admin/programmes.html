@@ -1,0 +1,100 @@
+{% extends "admin/_layout.html" %}
+{% from "admin/_bits.html" import pagination, delete_form, toggle_form with context %}
+{% block title %}Programmes - Admin{% endblock %}
+{% block admin_content %}
+
+<div class="page-banner">
+    <div>
+        <h1>Programmes &amp; Courses</h1>
+        <p>Entry requirements, cut-off points, tuition fees and admission year for every course.</p>
+    </div>
+    <div class="banner-actions">
+        <a class="btn btn-outline" href="{{ url_for('admin.export_csv', kind='programmes') }}">Export CSV</a>
+        <a class="btn btn-primary" href="{{ url_for('admin.programme_add') }}">+ Add New</a>
+    </div>
+</div>
+
+<form class="table-controls" method="get" action="{{ url_for('admin.programmes') }}">
+    <input type="search" name="q" value="{{ q }}" placeholder="Search programme or university…">
+    <select name="university">
+        <option value="">All universities</option>
+        {% for u in universities %}
+            <option value="{{ u.id }}" {{ 'selected' if university == u.id }}>{{ u.name }}</option>
+        {% endfor %}
+    </select>
+    <select name="level">
+        <option value="">All levels</option>
+        <option value="Bachelor" {{ 'selected' if level == 'Bachelor' }}>Bachelor</option>
+        <option value="Diploma" {{ 'selected' if level == 'Diploma' }}>Diploma</option>
+        <option value="Certificate" {{ 'selected' if level == 'Certificate' }}>Certificate</option>
+        <option value="Postgraduate" {{ 'selected' if level == 'Postgraduate' }}>Postgraduate</option>
+    </select>
+    <select name="status">
+        <option value="">All statuses</option>
+        <option value="active" {{ 'selected' if status == 'active' }}>Active only</option>
+        <option value="inactive" {{ 'selected' if status == 'inactive' }}>Inactive only</option>
+    </select>
+    <select name="sort">
+        <option value="name" {{ 'selected' if sort == 'name' }}>Sort by name</option>
+        <option value="level" {{ 'selected' if sort == 'level' }}>Sort by level</option>
+        <option value="year" {{ 'selected' if sort == 'year' }}>Sort by year</option>
+        <option value="tuition" {{ 'selected' if sort == 'tuition' }}>Sort by tuition</option>
+        <option value="cutoff" {{ 'selected' if sort == 'cutoff' }}>Sort by cut-off</option>
+    </select>
+    <select name="dir">
+        <option value="asc" {{ 'selected' if direction == 'asc' }}>Ascending</option>
+        <option value="desc" {{ 'selected' if direction == 'desc' }}>Descending</option>
+    </select>
+    <button class="btn btn-sm btn-outline" type="submit">Apply</button>
+    <a class="btn btn-sm btn-ghost" href="{{ url_for('admin.programmes') }}">Reset</a>
+    <span class="result-count">{{ page_obj.total if page_obj else programmes|length }} result(s)</span>
+</form>
+
+{% if not programmes %}
+    <div class="empty-state">
+        <strong>No programmes match your search</strong>
+        Clear the filters or add a new programme.
+    </div>
+{% else %}
+<div class="table-wrap">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Programme</th>
+                <th>University</th>
+                <th>Level</th>
+                <th>Principal passes</th>
+                <th>Cut-off (Gov/Private)</th>
+                <th>Tuition (private)</th>
+                <th>Year</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for programme in programmes %}
+                <tr>
+                    <td><a href="{{ url_for('admin.programme_view', programme_id=programme.id) }}">{{ programme.name }}</a></td>
+                    <td>{{ programme.university.name if programme.university else '—' }}</td>
+                    <td>{{ programme.level }}</td>
+                    <td>{{ programme.principal_passes if programme.principal_passes is not none else '—' }}</td>
+                    <td>{{ programme.cutoff_government if programme.cutoff_government is not none else '—' }}
+                        / {{ programme.cutoff_private if programme.cutoff_private is not none else '—' }}</td>
+                    <td>{{ programme.tuition_private|money if programme.tuition_private else '—' }}</td>
+                    <td>{{ programme.admission_year or '—' }}</td>
+                    <td><span class="badge {{ 'badge-on' if programme.active else 'badge-off' }}">{{ 'Active' if programme.active else 'Inactive' }}</span></td>
+                    <td class="row-actions">
+                        <a class="text-link" href="{{ url_for('admin.programme_view', programme_id=programme.id) }}">View</a>
+                        <a class="text-link" href="{{ url_for('admin.programme_edit', programme_id=programme.id) }}">Edit</a>
+                        {{ toggle_form(url_for('admin.programme_toggle', programme_id=programme.id), programme.active) }}
+                        {{ delete_form(url_for('admin.programme_delete', programme_id=programme.id), programme.name, require_typing=true) }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{{ pagination(page_obj) }}
+{% endif %}
+
+{% endblock %}

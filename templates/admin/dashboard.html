@@ -1,0 +1,82 @@
+{% extends "admin/_layout.html" %}
+{% from "admin/_bits.html" import pagination with context %}
+{% block title %}Admin Dashboard - {{ site_name }}{% endblock %}
+{% block admin_content %}
+
+<div class="page-banner">
+    <div>
+        <h1>Administrator Dashboard</h1>
+        <p>Manage universities, programmes, admission requirements, users and datasets.
+           Keep admission information up to date each academic year.</p>
+    </div>
+    <div class="banner-actions">
+        <a class="btn btn-primary" href="{{ url_for('admin.university_add') }}">+ Add university</a>
+        <a class="btn btn-outline" href="{{ url_for('admin.programme_add') }}">+ Add programme</a>
+    </div>
+</div>
+
+<div class="stat-grid">
+    <a class="stat-card" href="{{ url_for('admin.universities') }}">
+        <strong>{{ stats.universities }}</strong><span>Universities</span>
+        <em>{{ stats.active_universities }} active</em>
+    </a>
+    <a class="stat-card" href="{{ url_for('admin.programmes') }}">
+        <strong>{{ stats.programmes }}</strong><span>Active programmes</span>
+        <em>{{ stats.total_programmes }} in total</em>
+    </a>
+    <a class="stat-card" href="{{ url_for('admin.requirements') }}">
+        <strong>{{ stats.requirements }}</strong><span>Admission requirement records</span>
+        <em>rules, grades &amp; cut-offs</em>
+    </a>
+    <a class="stat-card" href="{{ url_for('admin.data_overview') }}">
+        <strong>{{ stats.datasets }}</strong><span>Datasets</span>
+        <em>{{ stats.uploads }} uploads · {{ stats.runs }} runs</em>
+    </a>
+    <a class="stat-card" href="{{ url_for('admin.users') }}">
+        <strong>{{ stats.students }}</strong><span>Students</span>
+        <em>{{ stats.admins }} admin(s)</em>
+    </a>
+    <a class="stat-card" href="{{ url_for('admin.careers') }}">
+        <strong>{{ stats.careers }}</strong><span>Careers</span>
+    </a>
+    <a class="stat-card" href="{{ url_for('admin.enquiries') }}">
+        <strong>{{ stats.enquiries }}</strong><span>Enquiries</span>
+    </a>
+    <a class="stat-card" href="{{ url_for('admin.dashboard') }}">
+        <strong>{{ stats.saved }}</strong><span>Saved recommendations</span>
+    </a>
+</div>
+
+<div class="card">
+    <h2>Recent administrative activity</h2>
+    {% if not recent %}
+        <div class="empty-state">
+            <strong>No activity recorded yet</strong>
+            Creating, editing, deleting and importing records will appear here.
+        </div>
+    {% else %}
+        {% for entry in recent %}
+            <div class="activity-item">
+                <span class="action-chip chip-{{ 'delete' if entry.action == 'delete' else 'create' if entry.action == 'create' else 'update' }}">{{ entry.action }}</span>
+                <div>
+                    <div><span class="activity-who">{{ entry.user.name if entry.user else 'System' }}</span> {{ entry.summary() }}</div>
+                    <div class="activity-time">{{ entry.created_at.strftime('%d %b %Y %H:%M') if entry.created_at else '' }}</div>
+                </div>
+            </div>
+        {% endfor %}
+        <a class="text-link" href="{{ url_for('admin.activity_logs') }}">View all activity &rarr;</a>
+    {% endif %}
+</div>
+
+<div class="admin-menu">
+    <a class="btn btn-outline" href="{{ url_for('admin.requirements') }}">Admission requirements</a>
+    <a class="btn btn-outline" href="{{ url_for('admin.users') }}">Users</a>
+    <a class="btn btn-outline" href="{{ url_for('admin.enquiries') }}">Enquiries</a>
+    <a class="btn btn-ghost" href="{{ url_for('admin.import_data') }}">Import dataset</a>
+    <a class="btn btn-ghost" href="{{ url_for('admin.data_overview') }}">Dataset management</a>
+    <a class="btn btn-ghost" href="{{ url_for('admin.activity_logs') }}">Activity logs</a>
+    <a class="btn btn-ghost" href="{{ url_for('admin.settings') }}">Settings</a>
+    <a class="btn btn-ghost" href="{{ url_for('main.index') }}">View website</a>
+</div>
+
+{% endblock %}

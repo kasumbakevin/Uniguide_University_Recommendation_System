@@ -1,0 +1,92 @@
+{% extends "admin/_layout.html" %}
+{% block title %}Models - Admin{% endblock %}
+{% block admin_content %}
+
+<div class="page-banner">
+    <div>
+        <h1>ML Models</h1>
+        <p>Train the programme-discipline classifier and content recommender, then review versions before approving them for use.</p>
+    </div>
+</div>
+
+<div class="admin-menu">
+    <a class="btn btn-outline" href="{{ url_for('admin.data_overview') }}">Data</a>
+    <a class="btn btn-primary" href="{{ url_for('admin.models_overview') }}">Models</a>
+    <a class="btn btn-outline" href="{{ url_for('admin.predict') }}">Predict</a>
+    <a class="btn btn-ghost" href="{{ url_for('admin.dashboard') }}">Back to dashboard</a>
+</div>
+
+<div class="card">
+    <h2>Training</h2>
+    <p>Trains on the latest processed run (<code>uniguide_training_dataset.csv</code>, label = NCHE
+       Tier Discipline). Compares Logistic Regression, Decision Tree and RandomForest with a
+       stratified 60/20/20 split, keeps the best macro-F1 on the validation split and reports
+       held-out test accuracy.</p>
+    <p class="muted">No admission-outcome labels exist in this data, so no admission-success model is trained.</p>
+    <form method="post" action="{{ url_for('admin.models_train') }}"
+          onsubmit="return confirm('Train both models on the latest processed dataset?')">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn btn-primary" type="submit">Train models</button>
+    </form>
+</div>
+
+{% if versions %}
+<div class="card">
+    <h2>Registered versions</h2>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead><tr><th>Model</th><th>Algorithm</th><th>Target</th><th>Metrics</th><th>Trained</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+            {% for v in versions %}
+                <tr>
+                    <td><strong>{{ v.name }}</strong></td>
+                    <td>{{ v.algorithm }}</td>
+                    <td>{{ v.target }}</td>
+                    <td class="muted">
+                        {% for k, value in v.metrics_dict().items() %}{{ k }} = {{ value }}{% if not loop.last %} · {% endif %}{% endfor %}
+                    </td>
+                    <td>{{ v.created_at.strftime('%d %b %Y %H:%M') if v.created_at else '' }}</td>
+                    <td>{% if v.approved %}<span class="enquiry-category">approved</span>{% else %}<span class="muted">not approved</span>{% endif %}</td>
+                    <td>
+                        <form method="post" action="{{ url_for('admin.model_approve', version_id=v.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button class="btn btn-ghost" type="submit">Toggle</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr><td colspan="7" class="muted">Artifact: <code>{{ v.artifact }}</code> · Features: {{ v.features()|join(', ') }} · Limitations: {{ v.limitations }}</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+{% if artifacts %}
+<div class="card">
+    <h2>Artifacts on disk <span class="muted">(ml/models/)</span></h2>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead><tr><th>Model</th><th>File</th><th>Algorithm</th><th>Trained</th><th>Metrics</th></tr></thead>
+            <tbody>
+            {% for a in artifacts %}
+                <tr>
+                    <td><strong>{{ a.name }}</strong></td>
+                    <td><code>{{ a.file }}</code></td>
+                    <td>{{ a.algorithm }}</td>
+                    <td>{{ a.trained_at }}</td>
+                    <td class="muted">
+                        {% for k, value in a.metrics.items() %}{{ k }} = {{ value }}{% if not loop.last %} · {% endif %}{% endfor %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <p class="muted">{{ artifacts[0].notes }}</p>
+</div>
+{% else %}
+<div class="card"><p class="muted">No trained artifacts yet. Click Train models above.</p></div>
+{% endif %}
+
+{% endblock %}

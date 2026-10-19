@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - UniGuide Uganda{% endblock %}
+{% block content %}
+
+<div class="page-banner">
+    <div>
+        <h1>Welcome, {{ current_user.name }}</h1>
+        <p>Your student dashboard — profile, saved recommendations, comparisons and notifications.</p>
+    </div>
+    <div class="banner-actions">
+        {% if profile %}
+            <a class="btn btn-outline" href="{{ url_for('student.report_pdf') }}">Download PDF report</a>
+            <a class="btn btn-primary" href="{{ url_for('student.recommendations') }}">See recommendations</a>
+        {% else %}
+            <a class="btn btn-primary" href="{{ url_for('student.profile') }}">Create my profile</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="dashboard-grid">
+
+    <div class="panel">
+        <h2><span class="panel-num">{{ unread }}</span> Notifications</h2>
+        {% if notifications %}
+            <ul class="notification-list">
+                {% for note in notifications %}
+                    <li class="notification {% if not note.read %}unread{% endif %}">
+                        <span class="notification-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path></svg>
+                        </span>
+                        <span>{{ note.message }}</span>
+                        <span class="muted">{{ note.created_at.strftime('%d %b %Y') }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+            <form method="post" action="{{ url_for('student.mark_notifications_read') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="btn btn-ghost btn-sm" type="submit">Mark all as read</button>
+            </form>
+        {% else %}
+            <p class="muted">No notifications yet.</p>
+        {% endif %}
+    </div>
+
+    <div class="panel">
+        <h2>My profile</h2>
+        {% if profile_data %}
+            <ul class="profile-summary">
+                <li><span>Citizenship</span><strong>{% if profile_data.citizenship == 'foreign' %}Foreigner{% else %}Ugandan{% endif %}</strong></li>
+                <li><span>Gender</span><strong>{{ profile_data.gender or 'Not specified' }}</strong></li>
+                <li><span>Academic record</span><strong>{{ profile_data.uce_summary or 'See profile' }}</strong></li>
+                <li><span>Preferred field</span><strong>{{ profile_data.preferred_field or 'All fields' }}</strong></li>
+                <li><span>Budget</span><strong>{% if profile_data.budget %}UGX {{ profile_data.budget|money }}{% else %}—{% endif %}</strong></li>
+                <li><span>Region</span><strong>{{ profile_data.preferred_region or 'Any' }}</strong></li>
+                <li><span>Sponsorship</span><strong>{{ 'Government' if profile_data.sponsorship_pref == 'government' else 'Private' }}</strong></li>
+                <li><span>Sports</span><strong>{% if profile_data.sports_level %}{{ profile_data.sports_level }} level{% if profile_data.sports_details %} — {{ profile_data.sports_details }}{% endif %}{% else %}None{% endif %}</strong></li>
+            </ul>
+            <a class="btn btn-outline btn-sm" href="{{ url_for('student.profile') }}">Update profile</a>
+        {% else %}
+            <p class="muted">You have not created an academic profile yet.</p>
+            <a class="btn btn-primary btn-sm" href="{{ url_for('student.profile') }}">Create profile</a>
+        {% endif %}
+    </div>
+
+    <div class="panel">
+        <h2>Saved recommendations</h2>
+        {% if saved %}
+            <ul class="saved-list">
+                {% for entry in saved %}
+                    <li>
+                        <span class="status-dot status-{{ entry.item.status|lower|replace(' ', '-') }}"></span>
+                        <div>
+                            <a href="{{ url_for('main.university_detail', university_id=entry.university.id) }}">{{ entry.programme.name }}</a>
+                            <span class="muted">{{ entry.university.name }} · {{ entry.item.status }} · {{ entry.item.suitability }}%</span>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="muted">No saved recommendations yet. Run a search and press "Save" on any course you like.</p>
+            <a class="btn btn-primary btn-sm" href="{{ url_for('student.recommendations') }}">Find recommendations</a>
+        {% endif %}
+    </div>
+
+    <div class="panel">
+        <h2>Comparison history</h2>
+        {% if comparisons %}
+            <ul class="saved-list">
+                {% for entry in comparisons %}
+                    <li>
+                        <div>
+                            <a class="text-link" href="{{ url_for('student.compare', ids=entry.university_ids|replace('[','')|replace(']','')|replace(' ','')) }}">Open comparison</a>
+                            <span class="muted">· {{ entry.created_at.strftime('%d %b %Y') }}</span>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="muted">Compare universities to build a comparison history.</p>
+            <a class="btn btn-outline btn-sm" href="{{ url_for('student.compare') }}">Compare universities</a>
+        {% endif %}
+    </div>
+
+</div>
+
+{% endblock %}

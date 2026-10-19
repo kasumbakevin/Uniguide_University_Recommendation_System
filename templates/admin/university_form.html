@@ -1,0 +1,109 @@
+{% extends "admin/_layout.html" %}
+{% from "_macros.html" import university_logo with context %}
+{% set fd = form_data if form_data else {} %}
+{% block title %}{{ 'Edit' if university else 'Add' }} University - Admin{% endblock %}
+{% block admin_content %}
+
+<div class="page-banner">
+    <div>
+        <h1>{{ 'Edit' if university else 'Add' }} University</h1>
+        <p>Contact details, website links, logo and status.</p>
+    </div>
+    <a class="btn btn-ghost" href="{{ url_for('admin.universities') }}">Back to list</a>
+</div>
+
+<form method="post" class="profile-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <section class="form-section">
+        <div class="field">
+            <label>University name</label>
+            <input type="text" name="name" required maxlength="160"
+                   value="{{ fd.get('name', university.name if university else '') }}">
+        </div>
+        <div class="field-row">
+            <div class="field">
+                <label>Type</label>
+                {% set selected_type = fd.get('institution_type', university.institution_type if university else 'public') %}
+                <select name="institution_type">
+                    <option value="public" {{ 'selected' if selected_type == 'public' }}>Public</option>
+                    <option value="private" {{ 'selected' if selected_type == 'private' }}>Private</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Established</label>
+                <input type="number" name="established" min="1900" max="2100"
+                       value="{{ fd.get('established', university.established if university and university.established else '') }}">
+            </div>
+        </div>
+        <div class="field-row">
+            <div class="field">
+                <label>Region</label>
+                <input type="text" name="region" maxlength="80" placeholder="e.g. Central"
+                       value="{{ fd.get('region', university.region if university else '') }}">
+            </div>
+            <div class="field">
+                <label>District</label>
+                <input type="text" name="district" maxlength="80"
+                       value="{{ fd.get('district', university.district if university else '') }}">
+            </div>
+            <div class="field">
+                <label>Location</label>
+                <input type="text" name="location" maxlength="120"
+                       value="{{ fd.get('location', university.location if university else '') }}">
+            </div>
+        </div>
+        <div class="field">
+            <label>Website</label>
+            <input type="url" name="website" placeholder="https://..."
+                   value="{{ fd.get('website', university.website if university else '') }}">
+        </div>
+        <div class="field">
+            <label>Application link</label>
+            <input type="url" name="application_link" placeholder="https://..."
+                   value="{{ fd.get('application_link', university.application_link if university else '') }}">
+        </div>
+        <div class="field">
+            <label>Logo image filename</label>
+            <input type="text" name="image" maxlength="255"
+                   value="{{ fd.get('image', university.image if university else '') }}"
+                   placeholder="e.g. makerere university.svg">
+            <p class="field-hint">A file inside static/images/. Leave blank for an initials badge.
+               Use the upload below to send a file directly.</p>
+        </div>
+        <label class="check-item">
+            <input type="checkbox" name="active"
+                   {{ 'checked' if fd.get('active', 'on' if not university or university.active else '') }}>
+            Active (shown to students)
+        </label>
+    </section>
+    <div class="form-actions">
+        <button class="btn btn-primary" type="submit">{{ 'Save Changes' if university else 'Add University' }}</button>
+        <a class="btn btn-ghost" href="{{ url_for('admin.universities') }}">Cancel</a>
+    </div>
+</form>
+
+{% if university %}
+<div class="card" style="margin-top: 22px;">
+    <h2>Logo</h2>
+    <div class="table-entity" style="margin-bottom: 14px;">
+        {{ university_logo(university, 'tiny') }}
+        <span class="muted">{{ university.image or 'no image set — initials badge shown' }}</span>
+    </div>
+    <form method="post" action="{{ url_for('admin.university_logo_upload', university_id=university.id) }}"
+          enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="field-row">
+            <div class="field">
+                <label>Upload a logo</label>
+                <input type="file" name="logo" accept=".png,.jpg,.jpeg,.gif,.webp,.svg,.ico,.jfif">
+                <p class="field-hint">PNG, JPG, GIF, WEBP, ICO or SVG up to 2 MB.</p>
+            </div>
+            <div class="field" style="align-self: end;">
+                <button class="btn btn-outline" type="submit">Upload logo</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endif %}
+
+{% endblock %}

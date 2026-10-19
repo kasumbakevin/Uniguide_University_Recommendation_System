@@ -1,0 +1,22 @@
+source,level,key,action,reason,kept_row,dropped_row
+catalogues,entity,gulu university | bachelor of science in agriculture | bachelor,review,"same key, conflicting values - both records retained",28,-1
+catalogues,entity,gulu university | bachelor of information communications and technology | bachelor,review,"same key, conflicting values - both records retained",33,-1
+catalogues,entity,gulu university | bachelor of business administration | bachelor,review,"same key, conflicting values - both records retained",37,-1
+catalogues,entity,gulu university | bachelor of secretarial and administrative studies | bachelor,review,"same key, conflicting values - both records retained",40,-1
+catalogues,entity,gulu university | bachelor of development economics | bachelor,review,"same key, conflicting values - both records retained",41,-1
+catalogues,entity,gulu university | bachelor of procurement and supply chain management | bachelor,review,"same key, conflicting values - both records retained",42,-1
+catalogues,entity,gulu university | bachelor of science with education (mathematics and economics) | bachelor,review,"same key, conflicting values - both records retained",45,-1
+catalogues,entity,gulu university | bachelor of arts with education | bachelor,review,"same key, conflicting values - both records retained",49,-1
+catalogues,entity,gulu university | bachelor of public administration | bachelor,review,"same key, conflicting values - both records retained",58,-1
+catalogues,entity,gulu university | bachelor of development management | bachelor,review,"same key, conflicting values - both records retained",60,-1
+catalogues,entity,kyambogo university | bachelor of business administration | bachelor,review,"same key, conflicting values - both records retained",81,-1
+catalogues,entity,kyambogo university | bachelor of science in accounting and finance | bachelor,review,"same key, conflicting values - both records retained",82,-1
+catalogues,entity,kyambogo university | bachelor of administrative science | bachelor,review,"same key, conflicting values - both records retained",84,-1
+catalogues,entity,kyambogo university | bachelor of procurement and logistics management | bachelor,review,"same key, conflicting values - both records retained",85,-1
+catalogues,entity,kyambogo university | bachelor of community development and social justice | bachelor,review,"same key, conflicting values - both records retained",95,-1
+catalogues,entity,kyambogo university | bachelor of community based rehabilitation | bachelor,review,"same key, conflicting values - both records retained",96,-1
+catalogues,entity,kyambogo university | bachelor of science with education (biological sciences) | bachelor,review,"same key, conflicting values - both records retained",110,-1
+catalogues,entity,kyambogo university | bachelor of science with education (economics) | bachelor,review,"same key, conflicting values - both records retained",111,-1
+catalogues,entity,kyambogo university | bachelor of science with education (physical sciences) | bachelor,review,"same key, conflicting values - both records retained",112,-1
+catalogues,entity,kyambogo university | bachelor of arts in social sciences | bachelor,review,"same key, conflicting values - both records retained",145,-1
+catalogues,entity,kyambogo university | bachelor of arts with education | bachelor,review,"same key, conflicting values - both records retained",150,-1
